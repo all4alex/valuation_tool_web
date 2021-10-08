@@ -30,9 +30,6 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
   <script>
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
@@ -97,5 +94,26 @@
       loadMainDartJs();
     }
   </script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1//firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-analytics.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZJY-279z8WNJSrLy3XSoQGMVT4nBf8Ls",
+    authDomain: "carketa-1d4b8.firebaseapp.com",
+    databaseURL: "https://carketa-1d4b8.firebaseio.com",
+    projectId: "carketa-1d4b8",
+    storageBucket: "carketa-1d4b8.appspot.com",
+    messagingSenderId: "707513737863",
+    appId: "1:707513737863:web:31afc397c9a9a931c34e22",
+    measurementId: "G-Y3G1Z4E2DM"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
 </body>
 </html>
