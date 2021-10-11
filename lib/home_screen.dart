@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:valuation_tool_web/main.dart';
+import 'package:valuation_tool_web/pages/vehicle_details.dart';
+import 'package:valuation_tool_web/pages/HelpPage.dart';
+import 'package:valuation_tool_web/pages/HomePage.dart';
+import 'package:valuation_tool_web/pages/ProfilePage.dart';
+import 'package:valuation_tool_web/pages/SettingsPage.dart';
+import 'package:valuation_tool_web/pages/vin_page.dart';
+import 'package:valuation_tool_web/widgets/add_vehicle_modal_body.dart';
 import 'package:valuation_tool_web/widgets/folder_menu_item.dart';
 import 'package:valuation_tool_web/widgets/side_menu_item.dart';
 import 'package:valuation_tool_web/widgets/side_sub_menu_item.dart';
 import 'package:valuation_tool_web/widgets/vehicle_list.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+import 'models/vehicle_response.dart';
 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key, required this.page, this.extra})
+      : super(key: key);
+  final String page;
+  final String? extra;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -275,7 +287,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
             ],
           ),
-          const VehicleList()
+          Container(
+            width: MediaQuery.of(context).size.width * 0.75,
+            child: Center(
+              child: IndexedStack(
+                index: pages.indexOf(widget.page),
+                children: [
+                  VehicleList(onItemSelect: (int i) {
+                    Navigator.pushNamed(context, '/main/${pages[0]}/$i');
+                  }),
+                  Home(onPressed: () {
+                    Navigator.pushNamed(context, '/main/${pages[5]}/Scott');
+                  }),
+                  VehicleDetails(widget.extra ?? ''),
+                  Profile(),
+                  Settings(),
+                  Help(),
+                  VinPage(
+                    vin: widget.extra ?? '',
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -287,8 +321,13 @@ class _HomeScreenState extends State<HomeScreen> {
       transitionDuration: const Duration(milliseconds: 0),
       context: context,
       pageBuilder: (BuildContext context, anim1, anim2) {
-        return const Align(
-            alignment: Alignment.center, child: AddVehicleModalBody());
+        return Align(
+            alignment: Alignment.center,
+            child: AddVehicleModalBody(
+              onDataFound: (String vin) {
+                Navigator.pushNamed(context, '/main/${pages[2]}/$vin');
+              },
+            ));
       },
       transitionBuilder:
           (BuildContext context, anim1, Animation<double> anim2, Widget child) {

@@ -9,6 +9,6 @@ abstract class BlackBookVehicleApiService {
 
   @GET('UsedCarWS/UsedCarWS/UsedVehicle/VIN/{vin}')
   Future<VehicleResponse> searchVehicle({
-    @Path() String vin,
+    @Path() required String vin,
   });
 }

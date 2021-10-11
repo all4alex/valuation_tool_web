@@ -1,3 +1,4 @@
+import 'add_deduct_list.dart';
 import 'mileage_list.dart';
 
 class UsedVehicleListItem {
@@ -90,7 +91,9 @@ class UsedVehicleListItem {
   double? wheelBase;
   String? tireSize;
   int? gvw;
+  String? towCap;
   String? seatCap;
+  String? seats;
   String? fuelType;
   String? fuelCap;
   String? fuelDelivery;
@@ -102,20 +105,16 @@ class UsedVehicleListItem {
   String? baseHp;
   double? taxableHp;
   String? torque;
-  String? oilCap;
   String? transmission;
   String? drivetrain;
   String? numGears;
   String? extDoors;
-  String? moonSunroof;
   String? airbags;
-  String? antiCorrosionWarranty;
   String? basicWarranty;
   String? powertrainWarranty;
-  String? roadAssistWarranty;
-  List<dynamic>? addDeductList;
+  List<AddDeductList>? addDeductList;
   List<MileageList>? mileageList;
-  List<String>? modelNumberList;
+  List<dynamic>? modelNumberList;
 
   UsedVehicleListItem({
     this.publishDate,
@@ -207,7 +206,9 @@ class UsedVehicleListItem {
     this.wheelBase,
     this.tireSize,
     this.gvw,
+    this.towCap,
     this.seatCap,
+    this.seats,
     this.fuelType,
     this.fuelCap,
     this.fuelDelivery,
@@ -219,17 +220,13 @@ class UsedVehicleListItem {
     this.baseHp,
     this.taxableHp,
     this.torque,
-    this.oilCap,
     this.transmission,
     this.drivetrain,
     this.numGears,
     this.extDoors,
-    this.moonSunroof,
     this.airbags,
-    this.antiCorrosionWarranty,
     this.basicWarranty,
     this.powertrainWarranty,
-    this.roadAssistWarranty,
     this.addDeductList,
     this.mileageList,
     this.modelNumberList,
@@ -326,7 +323,9 @@ class UsedVehicleListItem {
       wheelBase: (json['wheel_base'] as num?)?.toDouble(),
       tireSize: json['tire_size'] as String?,
       gvw: json['gvw'] as int?,
+      towCap: json['tow_cap'] as String?,
       seatCap: json['seat_cap'] as String?,
+      seats: json['seats'] as String?,
       fuelType: json['fuel_type'] as String?,
       fuelCap: json['fuel_cap'] as String?,
       fuelDelivery: json['fuel_delivery'] as String?,
@@ -338,22 +337,20 @@ class UsedVehicleListItem {
       baseHp: json['base_hp'] as String?,
       taxableHp: (json['taxable_hp'] as num?)?.toDouble(),
       torque: json['torque'] as String?,
-      oilCap: json['oil_cap'] as String?,
       transmission: json['transmission'] as String?,
       drivetrain: json['drivetrain'] as String?,
       numGears: json['num_gears'] as String?,
       extDoors: json['ext_doors'] as String?,
-      moonSunroof: json['moon_sunroof'] as String?,
       airbags: json['airbags'] as String?,
-      antiCorrosionWarranty: json['anti_corrosion_warranty'] as String?,
       basicWarranty: json['basic_warranty'] as String?,
       powertrainWarranty: json['powertrain_warranty'] as String?,
-      roadAssistWarranty: json['road_assist_warranty'] as String?,
-      addDeductList: json['add_deduct_list'] as List<dynamic>?,
+      addDeductList: (json['add_deduct_list'] as List<dynamic>?)
+          ?.map((e) => AddDeductList.fromJson(e as Map<String, dynamic>))
+          .toList(),
       mileageList: (json['mileage_list'] as List<dynamic>?)
           ?.map((e) => MileageList.fromJson(e as Map<String, dynamic>))
           .toList(),
-      modelNumberList: json['model_number_list'] as List<String>?,
+      modelNumberList: json['model_number_list'] as List<dynamic>?,
     );
   }
 
@@ -447,7 +444,9 @@ class UsedVehicleListItem {
         'wheel_base': wheelBase,
         'tire_size': tireSize,
         'gvw': gvw,
+        'tow_cap': towCap,
         'seat_cap': seatCap,
+        'seats': seats,
         'fuel_type': fuelType,
         'fuel_cap': fuelCap,
         'fuel_delivery': fuelDelivery,
@@ -459,18 +458,14 @@ class UsedVehicleListItem {
         'base_hp': baseHp,
         'taxable_hp': taxableHp,
         'torque': torque,
-        'oil_cap': oilCap,
         'transmission': transmission,
         'drivetrain': drivetrain,
         'num_gears': numGears,
         'ext_doors': extDoors,
-        'moon_sunroof': moonSunroof,
         'airbags': airbags,
-        'anti_corrosion_warranty': antiCorrosionWarranty,
         'basic_warranty': basicWarranty,
         'powertrain_warranty': powertrainWarranty,
-        'road_assist_warranty': roadAssistWarranty,
-        'add_deduct_list': addDeductList,
+        'add_deduct_list': addDeductList?.map((e) => e.toJson()).toList(),
         'mileage_list': mileageList?.map((e) => e.toJson()).toList(),
         'model_number_list': modelNumberList,
       };
