@@ -12,9 +12,17 @@ import 'package:valuation_tool_web/models/vehicle_response.dart';
 
 import 'add_vehicle_modal_body.dart';
 
+class VehicleListArgs {
+  VehicleListArgs(this.folder);
+  final String? folder;
+}
+
 class VehicleList extends StatefulWidget {
   const VehicleList(
-      {Key? key, required this.onItemSelect, required this.onAddButtonClicked
+      {Key? key,
+      required this.onItemSelect,
+      required this.onAddButtonClicked,
+      required this.folder
       // required this.title,
       // required this.subTitle,
       // required this.vin,
@@ -25,6 +33,7 @@ class VehicleList extends StatefulWidget {
       : super(key: key);
   final Function onItemSelect;
   final Function onAddButtonClicked;
+  final String folder;
   @override
   State<VehicleList> createState() => _VehicleListState();
 }
@@ -32,10 +41,18 @@ class VehicleList extends StatefulWidget {
 class _VehicleListState extends State<VehicleList> {
   late List<VehicleItem> vehicleItemList = <VehicleItem>[];
   late VehicleListBloc vehicleListBloc;
+  late VehicleListArgs args;
   @override
   void initState() {
-    vehicleListBloc = BlocProvider.of<VehicleListBloc>(context);
-    vehicleListBloc.getVehicleList();
+    Future.delayed(Duration.zero, () {
+      args = ModalRoute.of(context)!.settings.arguments as VehicleListArgs;
+      vehicleListBloc = BlocProvider.of<VehicleListBloc>(context);
+      if (args.folder == 'all') {
+        vehicleListBloc.getVehicleList();
+      } else {
+        vehicleListBloc.getVehicleListPerFolder(folderName: args.folder!);
+      }
+    });
     super.initState();
   }
 

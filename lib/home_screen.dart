@@ -38,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool subItem2 = false;
   bool subItem3 = false;
   bool subItem4 = false;
+  String folderFilter = 'all';
 
   TextStyle roboto = GoogleFonts.roboto();
   final ButtonStyle style =
@@ -103,7 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   subItem3 = false;
                                   subItem4 = false;
                                 });
-                                Navigator.pushNamed(context, '/main/vehicles');
+                                Navigator.pushNamed(context, '/main/vehicles',
+                                    arguments: VehicleListArgs('all'));
                               },
                             ),
                             SideSubMenuItem(
@@ -203,7 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   title: ' ${folderItemList[i].folderName}',
                                   isSelected: false,
                                   folderCount: folderItemList[i].folderCount!,
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, '/main/vehicles',
+                                        arguments: VehicleListArgs(
+                                            folderItemList[i].folderName));
+                                  },
                                 );
                               }),
                         );
@@ -305,12 +312,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IndexedStack(
                 index: pages.indexOf(widget.page),
                 children: [
-                  VehicleList(onItemSelect: (String vin) {
-                    Navigator.pushNamed(context, '/main/details/$vin',
-                        arguments: VehicleDetailsArgs(null));
-                  }, onAddButtonClicked: () {
-                    _showDialogModal(context);
-                  }),
+                  VehicleList(
+                      onItemSelect: (String vin) {
+                        Navigator.pushNamed(context, '/main/details/$vin',
+                            arguments: VehicleDetailsArgs(null));
+                      },
+                      onAddButtonClicked: () {
+                        _showDialogModal(context);
+                      },
+                      folder: folderFilter),
                   Home(onPressed: () {
                     Navigator.pushNamed(context, '/main/${pages[5]}/Scott');
                   }),

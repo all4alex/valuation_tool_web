@@ -19,4 +19,15 @@ class VehicleListBloc extends Cubit<VehicleListState> {
       emit(VehicleListFailedState(error: e.toString()));
     }
   }
+
+  void getVehicleListPerFolder({required String folderName}) async {
+    emit(VehicleListLoadingState());
+    try {
+      List<VehicleItem> vehicleItemList = await _firestoreVehicleService
+          .getVehiclesPerFolder(folderName: folderName);
+      emit(VehicleListSuccessState(list: vehicleItemList));
+    } catch (e) {
+      emit(VehicleListFailedState(error: e.toString()));
+    }
+  }
 }
