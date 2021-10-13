@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:valuation_tool_web/main.dart';
@@ -14,7 +15,10 @@ import 'package:valuation_tool_web/widgets/side_menu_item.dart';
 import 'package:valuation_tool_web/widgets/side_sub_menu_item.dart';
 import 'package:valuation_tool_web/widgets/vehicle_list.dart';
 
-import 'models/vehicle_response.dart';
+import 'bloc/folder/folder_bloc.dart';
+import 'bloc/folder/folder_state.dart';
+import 'bloc/vehicle_list/vehicle_list_bloc.dart';
+import 'models/firestore/folder_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.page, this.extra})
@@ -38,6 +42,16 @@ class _HomeScreenState extends State<HomeScreen> {
   TextStyle roboto = GoogleFonts.roboto();
   final ButtonStyle style =
       ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
+  late FolderBloc folderBloc;
+  List<FolderItem> folderItemList = <FolderItem>[];
+  TextEditingController folderTextController = TextEditingController();
+  @override
+  void initState() {
+    folderBloc = BlocProvider.of<FolderBloc>(context);
+    folderBloc.getAllFolder();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -89,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   subItem3 = false;
                                   subItem4 = false;
                                 });
+                                Navigator.pushNamed(context, '/main/vehicles');
                               },
                             ),
                             SideSubMenuItem(
@@ -170,38 +185,35 @@ class _HomeScreenState extends State<HomeScreen> {
                           alignment: Alignment.centerLeft,
                           child: Text('My Lists',
                               style: roboto.copyWith(fontSize: 20))),
-                      FolderMenuItem(
-                        icon: SvgPicture.asset('assets/svg/folder_icon.svg'),
-                        title: 'Orem Location',
-                        isSelected: false,
-                        folderCount: 43,
-                        onPressed: () {},
-                      ),
-                      FolderMenuItem(
-                        icon: SvgPicture.asset('assets/svg/folder_icon.svg'),
-                        title: 'Manheim Riverside',
-                        isSelected: false,
-                        folderCount: 23,
-                        onPressed: () {},
-                      ),
-                      FolderMenuItem(
-                        icon: SvgPicture.asset('assets/svg/folder_icon.svg'),
-                        title: 'Manheim Southern Cal',
-                        isSelected: false,
-                        folderCount: 10,
-                        onPressed: () {},
-                      ),
-                      FolderMenuItem(
-                        icon: SvgPicture.asset('assets/svg/folder_icon.svg'),
-                        title: 'Lehi Listing',
-                        isSelected: false,
-                        folderCount: 3,
-                        onPressed: () {},
-                      ),
+                      BlocBuilder<FolderBloc, FolderState>(
+                          builder: (BuildContext context, FolderState state) {
+                        if (state is GetFoldersSuccessState) {
+                          folderItemList = state.list;
+                        } else if (state is AddFolderLoadingState) {
+                          return CircularProgressIndicator();
+                        }
+                        return Container(
+                          height: screenSize.height * .3,
+                          child: ListView.builder(
+                              itemCount: folderItemList.length,
+                              itemBuilder: (BuildContext context, int i) {
+                                return FolderMenuItem(
+                                  icon: SvgPicture.asset(
+                                      'assets/svg/folder_icon.svg'),
+                                  title: ' ${folderItemList[i].folderName}',
+                                  isSelected: false,
+                                  folderCount: folderItemList[i].folderCount!,
+                                  onPressed: () {},
+                                );
+                              }),
+                        );
+                      }),
                       const SizedBox(height: 30),
                       ElevatedButton(
                         style: style,
-                        onPressed: () {},
+                        onPressed: () {
+                          _showNewFolderModal(context);
+                        },
                         child: SizedBox(
                           width: 170,
                           height: 40,
@@ -293,13 +305,18 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IndexedStack(
                 index: pages.indexOf(widget.page),
                 children: [
-                  VehicleList(onItemSelect: (int i) {
-                    Navigator.pushNamed(context, '/main/${pages[0]}/$i');
+                  VehicleList(onItemSelect: (String vin) {
+                    Navigator.pushNamed(context, '/main/details/$vin',
+                        arguments: VehicleDetailsArgs(null));
+                  }, onAddButtonClicked: () {
+                    _showDialogModal(context);
                   }),
                   Home(onPressed: () {
                     Navigator.pushNamed(context, '/main/${pages[5]}/Scott');
                   }),
-                  VehicleDetails(widget.extra ?? ''),
+                  VehicleDetails(widget.extra ?? '', onAddSuccess: () {
+                    BlocProvider.of<VehicleListBloc>(context).getVehicleList();
+                  }),
                   Profile(),
                   Settings(),
                   Help(),
@@ -315,6 +332,146 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showNewFolderModal(BuildContext context) async {
+    showGeneralDialog(
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 0),
+      context: context,
+      pageBuilder: (BuildContext context, anim1, anim2) {
+        return Align(
+            alignment: Alignment.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Container(
+                width: 570,
+                height: 300,
+                alignment: Alignment.center,
+                child: Material(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          height: 70,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          color: Colors.blue,
+                          child: Text('Add Folder',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white))),
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 30),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text('Folder name',
+                                    textAlign: TextAlign.start,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 10),
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10),
+                                      )),
+                                  child: TextFormField(
+                                    controller: folderTextController,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 20),
+                                    onChanged: (String text) {
+                                      // onChanged!(text);
+                                    },
+                                    onEditingComplete: () {
+                                      // onEditingComplete;
+                                    },
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.all(15),
+                                        hintText:
+                                            'Please enter a folder name here',
+                                        hintStyle: TextStyle(fontSize: 15)),
+                                  ),
+                                ),
+                                const SizedBox(height: 30),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.red),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Container(
+                                        width: 220,
+                                        height: 60,
+                                        alignment: Alignment.center,
+                                        child: const Text('Cancel',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.blue),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        folderBloc.addFolder(
+                                            folderItem: FolderItem(
+                                                folderName:
+                                                    folderTextController.text,
+                                                user:
+                                                    'alex.ayso@valuation.com'));
+                                        folderTextController.clear();
+                                      },
+                                      child: Container(
+                                        width: 220,
+                                        height: 60,
+                                        alignment: Alignment.center,
+                                        child: const Text('Add Vehicle',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ));
+      },
+      transitionBuilder:
+          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
+        return SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+                  .animate(anim1),
+          child: child,
+        );
+      },
+    );
+  }
+
   void _showDialogModal(BuildContext context) async {
     showGeneralDialog(
       barrierDismissible: false,
@@ -324,8 +481,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return Align(
             alignment: Alignment.center,
             child: AddVehicleModalBody(
-              onDataFound: (String vin) {
-                Navigator.pushNamed(context, '/main/${pages[2]}/$vin');
+              onDataFound: (String vin, String mileage) {
+                Navigator.pushNamed(context, '/main/${pages[2]}/$vin',
+                    arguments: VehicleDetailsArgs(mileage));
               },
             ));
       },

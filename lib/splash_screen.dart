@@ -12,12 +12,10 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushNamed(context, '/main/vehicles');
     });
     return Scaffold(
-      body: Container(
-        child: Text(
-          'Splash Screen...',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0),
-        ),
-      ),
+      body: Center(
+          child: SizedBox(
+              width: MediaQuery.of(context).size.width * .3,
+              child: Image.asset('assets/images/logo_with_name.png'))),
     );
   }
 }

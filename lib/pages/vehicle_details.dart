@@ -4,19 +4,34 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
 import 'package:valuation_tool_web/bloc/black_book_state.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
+import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_bloc.dart';
 import 'package:valuation_tool_web/models/add_deduct_list.dart';
+import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
+import 'package:valuation_tool_web/services/firestore/firestore_vehicle_service.dart';
 import 'package:valuation_tool_web/widgets/blackbook/black_book_retail_data.dart';
 import 'package:valuation_tool_web/widgets/blackbook/black_book_trade_in_data.dart';
 import 'package:valuation_tool_web/widgets/blackbook/black_book_wholesale_data.dart';
+import 'package:valuation_tool_web/widgets/dialog_folder_item.dart';
 import 'package:valuation_tool_web/widgets/info_item_with_spacing.dart';
 import 'package:valuation_tool_web/widgets/page_view.dart';
+import 'package:valuation_tool_web/widgets/select_folder_dialog_body.dart';
+
+enum VehicleQuality { rough, average, clean }
+
+class VehicleDetailsArgs {
+  VehicleDetailsArgs(this.mileage);
+  final String? mileage;
+}
 
 class VehicleDetails extends StatefulWidget {
-  final String vin;
+  const VehicleDetails(this.vin, {required this.onAddSuccess});
 
-  const VehicleDetails(this.vin);
+  final String vin;
+  final Function onAddSuccess;
 
   @override
   State<VehicleDetails> createState() => _VehicleDetailsState();
@@ -24,11 +39,18 @@ class VehicleDetails extends StatefulWidget {
 
 class _VehicleDetailsState extends State<VehicleDetails> {
   late BlackBookBloc blackBookBloc;
-
+  late VehicleDetailsArgs args;
+  late FolderBloc folderBloc;
   @override
   void initState() {
-    blackBookBloc = BlocProvider.of<BlackBookBloc>(context);
-    blackBookBloc.getVehiclDataByVin(vin: widget.vin);
+    Future.delayed(Duration.zero, () {
+      args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
+      print('THE MILEAGE: ${args.mileage}');
+      blackBookBloc = BlocProvider.of<BlackBookBloc>(context);
+      blackBookBloc.getVehiclDataByVin(vin: widget.vin, mileage: args.mileage);
+      folderBloc = BlocProvider.of<FolderBloc>(context);
+    });
+
     super.initState();
   }
 
@@ -66,6 +88,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               listener: (BuildContext context, BlackBookState state) {
             if (state is BlackBookLoadingState) {
             } else if (state is BlackBookSuccessState) {
+              widget.onAddSuccess();
             } else if (state is BlackBookFailedState) {
               print('THE error: ${state.error}');
             }
@@ -85,6 +108,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   '${usedVehicleListItem.country}, ${usedVehicleListItem.state}';
               String style = usedVehicleListItem.style.toString();
               String fuelType = usedVehicleListItem.fuelType.toString();
+              String folderName = state.vehicleItem.folder!;
 
               return Container(
                 child: Column(
@@ -135,8 +159,31 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                       'assets/svg/folder_icon.svg',
                                       color: Color(0xff36334E),
                                       fit: BoxFit.fitHeight)),
-                              Text('Orem Location',
-                                  style: TextStyle(fontSize: 10)),
+                              InkWell(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SelectFolderDialogBody(
+                                            vehicleItem: state.vehicleItem);
+                                      });
+                                },
+                                child: BlocBuilder<FolderBloc, FolderState>(
+                                    builder: (BuildContext context,
+                                        FolderState state) {
+                                  String text = folderName;
+                                  if (state is AddToFolderLoadingState) {
+                                    return Text(' Adding...',
+                                        style: TextStyle(fontSize: 10));
+                                  } else if (state is AddToFolderSuccessState) {
+                                    text = state.folderName;
+                                    folderBloc.getAllFolder();
+                                    widget.onAddSuccess();
+                                  }
+                                  return Text(' $text',
+                                      style: TextStyle(fontSize: 10));
+                                }),
+                              ),
                               const SizedBox(width: 10),
                               Icon(Icons.ios_share, color: Colors.green)
                             ],
@@ -319,74 +366,4 @@ class _VehicleDetailsState extends State<VehicleDetails> {
       ],
     );
   }
-
-  // void _showOptionsDialog(context, List<AddDeductList> addDeductList) {
-  //   // flutter defined function
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       // return alert dialog object
-  //       return AlertDialog(
-  //         title: new Text('Select options'),
-  //         content: Column(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: generateOptions(addDeductList)),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // List<Widget> generateOptions(List<AddDeductList> addDeductList) {
-  //   List<Widget> optionCheckBoxList = List<Widget>();
-  //   for (AddDeductList item in addDeductList) {
-  //     bool isChecked = options.contains(', ' + item.uoc);
-  //     optionCheckBoxList.add(Container(
-  //       height: 35,
-  //       width: 180,
-  //       alignment: Alignment.centerLeft,
-  //       child: StatefulBuilder(
-  //         builder: (context, setState) => CheckboxListTile(
-  //           title: Text(
-  //             item.name,
-  //             style: TextStyle(fontSize: 13),
-  //           ),
-  //           value: isChecked,
-  //           onChanged: (bool newValue) {
-  //             setState(() {
-  //               isChecked = newValue;
-  //             });
-  //             if (newValue) {
-  //               options = options + ', ' + item.uoc;
-  //             } else {
-  //               options = options.replaceAll(', ' + item.uoc, '');
-  //             }
-  //             print(options);
-  //           },
-  //           checkColor: Colors.white,
-  //           activeColor: Theme.of(context).primaryColor,
-  //           controlAffinity: ListTileControlAffinity.leading,
-  //         ),
-  //       ),
-  //     ));
-  //   }
-  //   RaisedButton raisedButton = RaisedButton(
-  //     color: Color(0xff18A0FB),
-  //     onPressed: () {
-  //       Navigator.of(context).pop();
-  //       updateVehicleDetail();
-  //     },
-  //     child: Text(
-  //       'UPDATE',
-  //       style: TextStyle(
-  //           fontWeight: FontWeight.bold, color: Theme.of(context).accentColor),
-  //     ),
-  //   );
-  //   optionCheckBoxList.add(Container(
-  //     padding: EdgeInsets.only(top: 15),
-  //     child: raisedButton,
-  //   ));
-  //   return optionCheckBoxList;
-  // }
 }

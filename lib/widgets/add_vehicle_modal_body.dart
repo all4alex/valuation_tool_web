@@ -8,13 +8,15 @@ import 'package:valuation_tool_web/models/vehicle_response.dart';
 class AddVehicleModalBody extends StatefulWidget {
   const AddVehicleModalBody({Key? key, required this.onDataFound})
       : super(key: key);
-  final Function(String) onDataFound;
+  final Function(String, String) onDataFound;
   @override
   State<AddVehicleModalBody> createState() => _AddVehicleModalBodyState();
 }
 
 class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
   TextEditingController vinTextEditingController = TextEditingController();
+  TextEditingController mileageTextEditingController = TextEditingController();
+
   bool roughSelected = false;
   bool averageSelected = true;
   bool cleanSelected = false;
@@ -116,6 +118,7 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
                                   Radius.circular(10),
                                 )),
                             child: TextFormField(
+                              controller: mileageTextEditingController,
                               textAlignVertical: TextAlignVertical.center,
                               style: const TextStyle(
                                   color: Colors.black, fontSize: 20),
@@ -246,8 +249,10 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
                                 onPressed: () {
                                   String inputedVin =
                                       vinTextEditingController.text;
+                                  String mileage =
+                                      mileageTextEditingController.text;
                                   Navigator.pop(context);
-                                  widget.onDataFound(inputedVin);
+                                  widget.onDataFound(inputedVin, mileage);
                                 },
                                 child: Container(
                                   width: 220,
