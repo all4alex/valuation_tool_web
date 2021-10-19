@@ -49,31 +49,4 @@ class FirestoreFolderService {
 
     return folderItem;
   }
-
-// WILL DELETE LATER
-  Future<bool> updatePin(String imageUrl, String title, String description,
-      String pinType, String id) async {
-    bool isSuccess = false;
-
-    await _collectionReference.doc(id).update({
-      'imageUrl': imageUrl,
-      'title': title,
-      'description': description,
-      'pinType': pinType
-    }).then((value) => isSuccess = true);
-
-    return isSuccess;
-  }
-
-// WILL DELETE LATER
-  Future<bool> deletePin(String id) async {
-    bool isSuccess = false;
-
-    await _collectionReference
-        .doc(id)
-        .delete()
-        .then((value) => isSuccess = true);
-
-    return isSuccess;
-  }
 }

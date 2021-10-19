@@ -1,3 +1,8 @@
+import 'dart:html';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,6 +11,8 @@ import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
 import 'package:valuation_tool_web/bloc/black_book_state.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
+import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
+import 'package:valuation_tool_web/bloc/upload_image/upload_image_state.dart';
 import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_bloc.dart';
 import 'package:valuation_tool_web/models/add_deduct_list.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
@@ -19,6 +26,7 @@ import 'package:valuation_tool_web/widgets/dialog_folder_item.dart';
 import 'package:valuation_tool_web/widgets/info_item_with_spacing.dart';
 import 'package:valuation_tool_web/widgets/page_view.dart';
 import 'package:valuation_tool_web/widgets/select_folder_dialog_body.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 enum VehicleQuality { rough, average, clean }
 
@@ -41,12 +49,19 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   late BlackBookBloc blackBookBloc;
   late VehicleDetailsArgs args;
   late FolderBloc folderBloc;
+  late UploadImageBloc uploadImageBloc;
+
+  String text = '';
+  late FilePickerResult? picked;
+  late File imageFile;
+  String imageUrl = '';
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
       args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc = BlocProvider.of<BlackBookBloc>(context);
+      uploadImageBloc = BlocProvider.of<UploadImageBloc>(context);
       blackBookBloc.getVehiclDataByVin(vin: widget.vin, mileage: args.mileage);
       folderBloc = BlocProvider.of<FolderBloc>(context);
     });
@@ -109,6 +124,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               String style = usedVehicleListItem.style.toString();
               String fuelType = usedVehicleListItem.fuelType.toString();
               String folderName = state.vehicleItem.folder!;
+              text = folderName;
 
               return Container(
                 child: Column(
@@ -118,12 +134,37 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 170,
-                          height: 110,
-                          color: Colors.grey,
-                          child: Icon(Icons.image),
-                        ),
+                        BlocBuilder<UploadImageBloc, UploadImageState>(builder:
+                            (BuildContext context, UploadImageState state) {
+                          if (state is UploadImageLoadingState) {
+                            return Container(
+                              width: 170,
+                              height: 110,
+                              color: Colors.grey,
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (state is UploadImageFailedState) {
+                          } else if (state is UploadImageSuccessState) {
+                            imageUrl = state.imageUrl;
+                          }
+                          return InkWell(
+                            onTap: () async {
+                              picked = await FilePicker.platform
+                                  .pickFiles(type: FileType.image);
+                              uploadImageBloc.uploadImage(
+                                  imageByte: picked!.files.first.bytes!,
+                                  fileName: widget.vin);
+                            },
+                            child: Container(
+                              width: 170,
+                              height: 110,
+                              color: Colors.grey,
+                              child: imageUrl.isEmpty
+                                  ? Icon(Icons.image)
+                                  : CachedNetworkImage(imageUrl: imageUrl),
+                            ),
+                          );
+                        }),
                         const SizedBox(width: 5),
                         Padding(
                           padding: EdgeInsets.only(top: 10),
@@ -171,13 +212,11 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                 child: BlocBuilder<FolderBloc, FolderState>(
                                     builder: (BuildContext context,
                                         FolderState state) {
-                                  String text = folderName;
                                   if (state is AddToFolderLoadingState) {
                                     return Text(' Adding...',
                                         style: TextStyle(fontSize: 10));
                                   } else if (state is AddToFolderSuccessState) {
                                     text = state.folderName;
-                                    folderBloc.getAllFolder();
                                     widget.onAddSuccess();
                                   }
                                   return Text(' $text',

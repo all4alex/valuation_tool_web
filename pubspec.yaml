@@ -30,6 +30,7 @@ dependencies:
   firebase_storage: ^10.0.5
   cloud_firestore: ^2.5.3
   fluro: ^2.0.3
+  file_picker: ^4.1.4
 
 dev_dependencies:
   flutter_test:

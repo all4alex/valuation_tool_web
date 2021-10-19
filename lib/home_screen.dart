@@ -46,10 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
   late FolderBloc folderBloc;
   List<FolderItem> folderItemList = <FolderItem>[];
   TextEditingController folderTextController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     folderBloc = BlocProvider.of<FolderBloc>(context);
-    folderBloc.getAllFolder();
+    if (widget.page == 'vehicles') {
+      folderBloc.getAllFolder();
+    }
     super.initState();
   }
 
@@ -193,26 +196,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           folderItemList = state.list;
                         } else if (state is AddFolderLoadingState) {
                           return CircularProgressIndicator();
+                        } else if (state is GetFoldersLoadingState) {
+                          return CircularProgressIndicator();
                         }
                         return Container(
                           height: screenSize.height * .3,
-                          child: ListView.builder(
-                              itemCount: folderItemList.length,
-                              itemBuilder: (BuildContext context, int i) {
-                                return FolderMenuItem(
-                                  icon: SvgPicture.asset(
-                                      'assets/svg/folder_icon.svg'),
-                                  title: ' ${folderItemList[i].folderName}',
-                                  isSelected: false,
-                                  folderCount: folderItemList[i].folderCount!,
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                        context, '/main/vehicles',
-                                        arguments: VehicleListArgs(
-                                            folderItemList[i].folderName));
-                                  },
-                                );
-                              }),
+                          child: Scrollbar(
+                            controller: _scrollController,
+                            isAlwaysShown: true,
+                            child: ListView.builder(
+                                controller: _scrollController,
+                                itemCount: folderItemList.length,
+                                itemBuilder: (BuildContext context, int i) {
+                                  return FolderMenuItem(
+                                    icon: SvgPicture.asset(
+                                        'assets/svg/folder_icon.svg'),
+                                    title: ' ${folderItemList[i].folderName}',
+                                    isSelected: false,
+                                    folderCount: folderItemList[i].folderCount!,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context,
+                                          '/main/folders/${folderItemList[i].folderName}',
+                                          arguments: VehicleListArgs(
+                                              folderItemList[i].folderName));
+                                    },
+                                  );
+                                }),
+                          ),
                         );
                       }),
                       const SizedBox(height: 30),
@@ -321,11 +331,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         _showDialogModal(context);
                       },
                       folder: folderFilter),
-                  Home(onPressed: () {
-                    Navigator.pushNamed(context, '/main/${pages[5]}/Scott');
-                  }),
+                  VehicleList(
+                      onItemSelect: (String vin) {
+                        Navigator.pushNamed(context, '/main/details/$vin',
+                            arguments: VehicleDetailsArgs(null));
+                      },
+                      onAddButtonClicked: () {
+                        _showDialogModal(context);
+                      },
+                      folder: folderFilter),
                   VehicleDetails(widget.extra ?? '', onAddSuccess: () {
                     BlocProvider.of<VehicleListBloc>(context).getVehicleList();
+                    folderBloc.getAllFolder();
                   }),
                   Profile(),
                   Settings(),
@@ -442,8 +459,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             folderItem: FolderItem(
                                                 folderName:
                                                     folderTextController.text,
-                                                user:
-                                                    'alex.ayso@valuation.com'));
+                                                user: 'alex.ayso@valuation.com',
+                                                folderCount: 0));
                                         folderTextController.clear();
                                       },
                                       child: Container(

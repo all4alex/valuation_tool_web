@@ -43,6 +43,19 @@ class FirestoreVehicleService {
     return pinModelList;
   }
 
+  Future<int> getFolderCount({required String folderName}) async {
+    int count = 0;
+    await _collectionReference
+        .where('folder', isEqualTo: folderName)
+        .get()
+        .then((value) {
+      count = value.size;
+    }).catchError((e) {
+      print('Firestore error: $e');
+    });
+    return count;
+  }
+
   Future<bool> addVehicle({required VehicleItem vehicleItem}) async {
     bool isSuccess = false;
     String id = await _collectionReference.add(vehicleItem).then((value) {
@@ -73,7 +86,9 @@ class FirestoreVehicleService {
     bool isSuccess = false;
     await _collectionReference.doc(id).update({
       'folder': folderName,
-    }).then((value) => isSuccess = true);
+    }).then((value) {
+      isSuccess = true;
+    });
     return isSuccess;
   }
 

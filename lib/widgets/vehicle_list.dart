@@ -151,73 +151,105 @@ class _VehicleListState extends State<VehicleList> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Container(
-                                            height: 68,
-                                            width: 100,
-                                            decoration: BoxDecoration(
-                                                color: const Color(0xffF3F3F3),
-                                                border: Border.all(
-                                                    width: 1,
-                                                    style: BorderStyle.solid,
-                                                    color: Colors.black)),
-                                            child: Image.asset(
-                                                'assets/images/sample_vehicle.png',
-                                                fit: BoxFit.fitHeight)),
-                                        const SizedBox(width: 10),
-                                        Container(
-                                          width: screenSize.width * .1,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(vehicleItem.name!,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      overflow:
-                                                          TextOverflow.clip,
-                                                      fontSize: 14)),
-                                              Text(vehicleItem.subName!,
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          Color(0xff898989))),
-                                            ],
+                                    Container(
+                                      width: screenSize.width * .2,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                              height: 68,
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xffF3F3F3),
+                                                  border: Border.all(
+                                                      width: 1,
+                                                      style: BorderStyle.solid,
+                                                      color: Colors.black)),
+                                              child: Image.asset(
+                                                  'assets/images/sample_vehicle.png',
+                                                  fit: BoxFit.fitHeight)),
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            width: screenSize.width * .1,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(vehicleItem.name!,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        overflow:
+                                                            TextOverflow.clip,
+                                                        fontSize: 14)),
+                                                Text(vehicleItem.subName!,
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        color:
+                                                            Color(0xff898989))),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Text(vehicleItem.vin!),
-                                        SizedBox(
-                                            height: 15,
-                                            width: 30,
-                                            child: SvgPicture.asset(
-                                                'assets/svg/copy_icon.svg',
-                                                color: Colors.green,
-                                                fit: BoxFit.fitHeight)),
-                                      ],
+                                    Container(
+                                      width: screenSize.width * .13,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(vehicleItem.vin!),
+                                          SizedBox(
+                                              height: 15,
+                                              width: 30,
+                                              child: SvgPicture.asset(
+                                                  'assets/svg/copy_icon.svg',
+                                                  color: Colors.green,
+                                                  fit: BoxFit.fitHeight)),
+                                        ],
+                                      ),
                                     ),
-                                    Text('${vehicleItem.miles} miles'),
-                                    Text('${vehicleItem.addedDate}'),
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                            height: 15,
-                                            width: 30,
-                                            child: SvgPicture.asset(
-                                                'assets/svg/folder_icon.svg',
-                                                color: Color(0xff36334E),
-                                                fit: BoxFit.fitHeight)),
-                                        Text('${vehicleItem.folder}')
-                                      ],
+                                    Container(
+                                        width: screenSize.width * .08,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                            '${vehicleItem.miles} miles',
+                                            style: TextStyle(
+                                                overflow: TextOverflow.clip))),
+                                    Container(
+                                        width: screenSize.width * .08,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text('${vehicleItem.addedDate}',
+                                            style: TextStyle(
+                                                overflow: TextOverflow.clip))),
+                                    Container(
+                                      width: screenSize.width * .12,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                              height: 15,
+                                              width: 30,
+                                              child: SvgPicture.asset(
+                                                  'assets/svg/folder_icon.svg',
+                                                  color: Color(0xff36334E),
+                                                  fit: BoxFit.fitHeight)),
+                                          SizedBox(
+                                            width: screenSize.width * .09,
+                                            child: Text('${vehicleItem.folder}',
+                                                style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.clip)),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                     SizedBox(
                                         height: 15,
-                                        width: 30,
+                                        width: 20,
                                         child: SvgPicture.asset(
                                             'assets/svg/preference_icon.svg',
                                             color: Color(0xff494949),

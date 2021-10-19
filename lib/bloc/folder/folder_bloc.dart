@@ -18,9 +18,8 @@ class FolderBloc extends Cubit<FolderState> {
           email: 'alex.ayso@valuation.com');
       List<FolderItem> updatedList = <FolderItem>[];
       for (FolderItem item in list) {
-        List itemList = await _firestoreVehicleService.getVehiclesPerFolder(
+        item.folderCount = await _firestoreVehicleService.getFolderCount(
             folderName: item.folderName.toString());
-        item.folderCount = itemList.length;
         updatedList.add(item);
       }
 
