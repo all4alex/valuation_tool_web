@@ -18,7 +18,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Carketa Valuation Web',
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       onGenerateRoute: Flurorouter.router.generator,

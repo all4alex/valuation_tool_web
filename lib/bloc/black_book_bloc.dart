@@ -77,7 +77,7 @@ class BlackBookBloc extends Cubit<BlackBookState> {
     String currentDateTime = dateFormat.format(DateTime.now()).toString();
 
     String? subName =
-        '${usedVehicleListItem.series}|${usedVehicleListItem.style}';
+        '${usedVehicleListItem.series} - ${usedVehicleListItem.style}';
 
     VehicleItem vehicleItem = VehicleItem(
         user: 'alex.ayso@valuation.com',

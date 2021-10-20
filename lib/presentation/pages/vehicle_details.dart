@@ -180,7 +180,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                     fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                               Text(
-                                  '${usedVehicleListItem.series} | ${usedVehicleListItem.style}',
+                                  '${usedVehicleListItem.series} - ${usedVehicleListItem.style}',
                                   style: TextStyle(
                                       fontSize: 10, color: Color(0xff777777))),
                               Divider(thickness: 2, height: 10),
