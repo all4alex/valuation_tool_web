@@ -169,7 +169,8 @@ class _VehicleListState extends State<VehicleList> {
                                                       color: Colors.black)),
                                               child: CachedNetworkImage(
                                                 fit: BoxFit.fitHeight,
-                                                imageUrl: vehicleItem.imageUrl!,
+                                                imageUrl:
+                                                    '${vehicleItem.imageUrl}_200x200',
                                               )),
                                           const SizedBox(width: 10),
                                           Container(
