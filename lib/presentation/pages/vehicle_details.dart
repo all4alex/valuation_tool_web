@@ -127,6 +127,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               String folderName = state.vehicleItem.folder!;
               text = folderName;
               vehicleItem = state.vehicleItem;
+              imageUrl = state.vehicleItem.imageUrl ?? '';
 
               return Container(
                 child: Column(
@@ -162,8 +163,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                               height: 110,
                               color: Colors.grey,
                               child: imageUrl.isEmpty
-                                  ? CachedNetworkImage(
-                                      imageUrl: vehicleItem.imageUrl!)
+                                  ? Icon(Icons.image)
                                   : CachedNetworkImage(imageUrl: imageUrl),
                             ),
                           );
