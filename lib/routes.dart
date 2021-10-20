@@ -1,7 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:valuation_tool_web/home_screen.dart';
-import 'package:valuation_tool_web/splash_screen.dart';
+import 'package:valuation_tool_web/presentation/home_screen.dart';
+import 'package:valuation_tool_web/presentation/splash_screen.dart';
 
 class Flurorouter {
   static final FluroRouter router = FluroRouter();

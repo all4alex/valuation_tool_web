@@ -5,10 +5,12 @@ import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
 import 'package:valuation_tool_web/bloc/black_book_state.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 
+import 'category_search.dart';
+
 class AddVehicleModalBody extends StatefulWidget {
   const AddVehicleModalBody({Key? key, required this.onDataFound})
       : super(key: key);
-  final Function(String, String) onDataFound;
+  final Function(String, String, String) onDataFound;
   @override
   State<AddVehicleModalBody> createState() => _AddVehicleModalBodyState();
 }
@@ -24,7 +26,8 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
       ElevatedButton.styleFrom(primary: const Color(0xff494949));
   final ButtonStyle unSelectedStyle =
       ElevatedButton.styleFrom(primary: const Color(0xffD9DBE1), elevation: 0);
-
+  bool isVinSearch = true;
+  String categoryUVC = '';
   @override
   void initState() {
     super.initState();
@@ -36,34 +39,23 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
       borderRadius: BorderRadius.circular(5),
       child: Container(
         width: 570,
-        height: 600,
+        height: MediaQuery.of(context).size.height - 50,
         alignment: Alignment.center,
         child: Material(
-          child: Column(
-            children: <Widget>[
-              Container(
-                  height: 70,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  color: Colors.blue,
-                  child: Text('Add Vehicle',
-                      style: GoogleFonts.roboto(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white))),
-              BlocListener<BlackBookBloc, BlackBookState>(
-                  listener: (BuildContext context, BlackBookState state) {
-                if (state is BlackBookLoadingState) {
-                } else if (state is BlackBookSuccessState) {
-                } else if (state is BlackBookFailedState) {
-                  print('THE error: ${state.error}');
-                }
-              }, child: BlocBuilder<BlackBookBloc, BlackBookState>(
-                      builder: (BuildContext context, BlackBookState state) {
-                if (state is BlackBookLoadingState) {
-                  return Center(child: const CircularProgressIndicator());
-                }
-                return Column(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Container(
+                    height: 70,
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    color: Colors.blue,
+                    child: Text('Add Vehicle',
+                        style: GoogleFonts.roboto(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white))),
+                Column(
                   children: <Widget>[
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -72,35 +64,56 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('VIN',
+                          Text(isVinSearch ? 'VIN' : 'BROWSE VEHICLES',
                               textAlign: TextAlign.start,
                               style: GoogleFonts.roboto(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 10),
+                          isVinSearch
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10),
+                                      )),
+                                  child: TextFormField(
+                                    controller: vinTextEditingController,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 40),
+                                    onChanged: (String text) {
+                                      // onChanged!(text);
+                                    },
+                                    onEditingComplete: () {
+                                      // onEditingComplete;
+                                    },
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.all(15),
+                                        hintText: 'Please enter a VIN here',
+                                        hintStyle: TextStyle(fontSize: 25)),
+                                  ),
+                                )
+                              : CategorySearch(
+                                  onFilledUp: (String uvc) {
+                                    categoryUVC = uvc;
+                                  },
+                                ),
                           Container(
-                            alignment: Alignment.center,
-                            height: 70,
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                )),
-                            child: TextFormField(
-                              controller: vinTextEditingController,
-                              textAlignVertical: TextAlignVertical.center,
-                              style: const TextStyle(
-                                  color: Colors.black, fontSize: 40),
-                              onChanged: (String text) {
-                                // onChanged!(text);
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isVinSearch = !isVinSearch;
+                                });
                               },
-                              onEditingComplete: () {
-                                // onEditingComplete;
-                              },
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.all(15),
-                                  hintText: 'Please enter a VIN here',
-                                  hintStyle: TextStyle(fontSize: 25)),
+                              child: Text(
+                                  isVinSearch
+                                      ? 'Switch to category search'
+                                      : 'Switch to VIN search',
+                                  style: TextStyle(color: Colors.blue)),
                             ),
                           ),
                           const Divider(thickness: 2, height: 40),
@@ -249,10 +262,12 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
                                 onPressed: () {
                                   String inputedVin =
                                       vinTextEditingController.text;
+
                                   String mileage =
                                       mileageTextEditingController.text;
                                   Navigator.pop(context);
-                                  widget.onDataFound(inputedVin, mileage);
+                                  widget.onDataFound(
+                                      inputedVin, mileage, categoryUVC);
                                 },
                                 child: Container(
                                   width: 220,
@@ -271,9 +286,9 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
                       ),
                     ),
                   ],
-                );
-              })),
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

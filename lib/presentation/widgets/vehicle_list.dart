@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -166,9 +167,10 @@ class _VehicleListState extends State<VehicleList> {
                                                       width: 1,
                                                       style: BorderStyle.solid,
                                                       color: Colors.black)),
-                                              child: Image.asset(
-                                                  'assets/images/sample_vehicle.png',
-                                                  fit: BoxFit.fitHeight)),
+                                              child: CachedNetworkImage(
+                                                fit: BoxFit.fitHeight,
+                                                imageUrl: vehicleItem.imageUrl!,
+                                              )),
                                           const SizedBox(width: 10),
                                           Container(
                                             width: screenSize.width * .1,
@@ -276,7 +278,7 @@ class _VehicleListState extends State<VehicleList> {
         return Align(
             alignment: Alignment.center,
             child: AddVehicleModalBody(
-              onDataFound: (String vin, String mileage) {},
+              onDataFound: (String vin, String mileage, String uvc) {},
             ));
       },
       transitionBuilder:

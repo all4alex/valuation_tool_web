@@ -18,27 +18,26 @@ import 'package:valuation_tool_web/models/add_deduct_list.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
+import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_retail_data.dart';
+import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_trade_in_data.dart';
+import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_wholesale_data.dart';
+import 'package:valuation_tool_web/presentation/widgets/info_item_with_spacing.dart';
+import 'package:valuation_tool_web/presentation/widgets/page_view.dart';
+import 'package:valuation_tool_web/presentation/widgets/select_folder_dialog_body.dart';
 import 'package:valuation_tool_web/services/firestore/firestore_vehicle_service.dart';
-import 'package:valuation_tool_web/widgets/blackbook/black_book_retail_data.dart';
-import 'package:valuation_tool_web/widgets/blackbook/black_book_trade_in_data.dart';
-import 'package:valuation_tool_web/widgets/blackbook/black_book_wholesale_data.dart';
-import 'package:valuation_tool_web/widgets/dialog_folder_item.dart';
-import 'package:valuation_tool_web/widgets/info_item_with_spacing.dart';
-import 'package:valuation_tool_web/widgets/page_view.dart';
-import 'package:valuation_tool_web/widgets/select_folder_dialog_body.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 enum VehicleQuality { rough, average, clean }
 
 class VehicleDetailsArgs {
-  VehicleDetailsArgs(this.mileage);
+  VehicleDetailsArgs({this.mileage, this.vin, this.uvc});
   final String? mileage;
+  final String? vin;
+  final String? uvc;
 }
 
 class VehicleDetails extends StatefulWidget {
-  const VehicleDetails(this.vin, {required this.onAddSuccess});
-
-  final String vin;
+  const VehicleDetails({required this.onAddSuccess});
   final Function onAddSuccess;
 
   @override
@@ -47,7 +46,7 @@ class VehicleDetails extends StatefulWidget {
 
 class _VehicleDetailsState extends State<VehicleDetails> {
   late BlackBookBloc blackBookBloc;
-  late VehicleDetailsArgs args;
+  late VehicleDetailsArgs args = VehicleDetailsArgs();
   late FolderBloc folderBloc;
   late UploadImageBloc uploadImageBloc;
 
@@ -55,6 +54,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   late FilePickerResult? picked;
   late File imageFile;
   String imageUrl = '';
+  late VehicleItem vehicleItem = VehicleItem();
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -62,7 +62,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc = BlocProvider.of<BlackBookBloc>(context);
       uploadImageBloc = BlocProvider.of<UploadImageBloc>(context);
-      blackBookBloc.getVehiclDataByVin(vin: widget.vin, mileage: args.mileage);
+      blackBookBloc.getVehiclDataByVin(
+          vin: args.vin, uvc: args.uvc, mileage: args.mileage);
       folderBloc = BlocProvider.of<FolderBloc>(context);
     });
 
@@ -125,6 +126,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               String fuelType = usedVehicleListItem.fuelType.toString();
               String folderName = state.vehicleItem.folder!;
               text = folderName;
+              vehicleItem = state.vehicleItem;
 
               return Container(
                 child: Column(
@@ -153,14 +155,15 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                   .pickFiles(type: FileType.image);
                               uploadImageBloc.uploadImage(
                                   imageByte: picked!.files.first.bytes!,
-                                  fileName: widget.vin);
+                                  vehicleItem: vehicleItem);
                             },
                             child: Container(
                               width: 170,
                               height: 110,
                               color: Colors.grey,
                               child: imageUrl.isEmpty
-                                  ? Icon(Icons.image)
+                                  ? CachedNetworkImage(
+                                      imageUrl: vehicleItem.imageUrl!)
                                   : CachedNetworkImage(imageUrl: imageUrl),
                             ),
                           );
@@ -176,12 +179,13 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 12),
                               ),
-                              Text('$driveTrain | $transmission',
+                              Text(
+                                  '${usedVehicleListItem.series} | ${usedVehicleListItem.style}',
                                   style: TextStyle(
                                       fontSize: 10, color: Color(0xff777777))),
                               Divider(thickness: 2, height: 10),
                               Text(
-                                widget.vin,
+                                args.vin ?? '--',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 12),
                               ),

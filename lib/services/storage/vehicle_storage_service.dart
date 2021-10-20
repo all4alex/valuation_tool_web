@@ -10,7 +10,9 @@ class VehicleStorageService {
 
   Future<String> uploadVehicleImage(
       {required Uint8List imageByte, required String fileName}) async {
-    UploadTask uploadTask = reference.child(fileName).putData(imageByte, null);
+    UploadTask uploadTask = reference
+        .child('$fileName')
+        .putData(imageByte, SettableMetadata(contentType: 'image/jpeg'));
 
     TaskSnapshot storageTaskSnapshot = await uploadTask;
     return storageTaskSnapshot.ref.getDownloadURL();

@@ -29,7 +29,12 @@ class _SelectFolderDialogBodyState extends State<SelectFolderDialogBody> {
     return BlocBuilder<FolderBloc, FolderState>(
         builder: (BuildContext context, FolderState state) {
       List<Widget> listOfFolder = <Widget>[];
-      if (state is GetFoldersSuccessState) {
+      if (state is GetFoldersLoadingState) {
+        return SimpleDialog(title: Text('Select folder'), children: [
+          SimpleDialogOption(
+              onPressed: null, child: Text('Loding folders... Please wait.'))
+        ]);
+      } else if (state is GetFoldersSuccessState) {
         listOfFolder = state.list.map((e) {
           return DialogFolderItem(
             icon: Icons.folder,

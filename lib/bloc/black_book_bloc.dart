@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -19,11 +17,18 @@ class BlackBookBloc extends Cubit<BlackBookState> {
   final BlackBookRepository blackBookRepository;
   FirestoreVehicleService _firestoreVehicleService = FirestoreVehicleService();
 
-  void getVehiclDataByVin({required String vin, String? mileage}) async {
+  void getVehiclDataByVin({String? vin, String? uvc, String? mileage}) async {
     emit(BlackBookLoadingState());
     try {
-      VehicleResponse vehicleResponse =
-          await blackBookRepository.getVehicleByVin(vin: vin);
+      VehicleResponse vehicleResponse;
+      print('THE VIN: $vin');
+      print('THE VIN: $uvc');
+
+      if (vin!.isNotEmpty) {
+        vehicleResponse = await blackBookRepository.getVehicleByVin(vin: vin);
+      } else {
+        vehicleResponse = await blackBookRepository.getVehicleByUvc(uvc: uvc!);
+      }
       print(
           'THE DATA: ${vehicleResponse.usedVehicles!.usedVehicleList![0].msrp}');
       UsedVehicles usedVehicleListItem = vehicleResponse.usedVehicles!;
@@ -34,10 +39,18 @@ class BlackBookBloc extends Cubit<BlackBookState> {
       String vehicleName = '$year $make $model';
       //save to firestore
       if (mileage != null) {
-        await _addVehicleToFirestore(vehicleResponse, vin, mileage);
+        await _addVehicleToFirestore(
+            vehicleResponse,
+            vin.isNotEmpty
+                ? vin
+                : vehicleResponse.usedVehicles!.usedVehicleList![0].vin!,
+            mileage);
       }
       VehicleItem vehicleItem = await _firestoreVehicleService.getVehicleData(
-          vin, 'alex.ayso@valuation.com');
+          vin.isNotEmpty
+              ? vin
+              : vehicleResponse.usedVehicles!.usedVehicleList![0].vin!,
+          'alex.ayso@valuation.com');
 
       emit(BlackBookSuccessState(
           vehicleResponse: vehicleResponse,
@@ -64,7 +77,7 @@ class BlackBookBloc extends Cubit<BlackBookState> {
     String currentDateTime = dateFormat.format(DateTime.now()).toString();
 
     String? subName =
-        '${usedVehicleListItem.drivetrain}|${usedVehicleListItem.transmission}';
+        '${usedVehicleListItem.series}|${usedVehicleListItem.style}';
 
     VehicleItem vehicleItem = VehicleItem(
         user: 'alex.ayso@valuation.com',

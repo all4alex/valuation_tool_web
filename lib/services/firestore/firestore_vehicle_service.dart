@@ -92,15 +92,14 @@ class FirestoreVehicleService {
     return isSuccess;
   }
 
-// WILL DELETE LATER
-  Future<bool> deletePin(String id) async {
+  Future<bool> updateVehicle({required VehicleItem vehicleItem}) async {
     bool isSuccess = false;
-
     await _collectionReference
-        .doc(id)
-        .delete()
-        .then((value) => isSuccess = true);
-
+        .doc(vehicleItem.id)
+        .update(vehicleItem.toJson())
+        .then((value) {
+      isSuccess = true;
+    });
     return isSuccess;
   }
 }

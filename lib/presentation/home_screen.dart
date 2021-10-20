@@ -2,23 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
+import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_bloc.dart';
 import 'package:valuation_tool_web/main.dart';
-import 'package:valuation_tool_web/pages/vehicle_details.dart';
-import 'package:valuation_tool_web/pages/HelpPage.dart';
-import 'package:valuation_tool_web/pages/HomePage.dart';
-import 'package:valuation_tool_web/pages/ProfilePage.dart';
-import 'package:valuation_tool_web/pages/SettingsPage.dart';
-import 'package:valuation_tool_web/pages/vin_page.dart';
-import 'package:valuation_tool_web/widgets/add_vehicle_modal_body.dart';
-import 'package:valuation_tool_web/widgets/folder_menu_item.dart';
-import 'package:valuation_tool_web/widgets/side_menu_item.dart';
-import 'package:valuation_tool_web/widgets/side_sub_menu_item.dart';
-import 'package:valuation_tool_web/widgets/vehicle_list.dart';
-
-import 'bloc/folder/folder_bloc.dart';
-import 'bloc/folder/folder_state.dart';
-import 'bloc/vehicle_list/vehicle_list_bloc.dart';
-import 'models/firestore/folder_item.dart';
+import 'package:valuation_tool_web/models/firestore/folder_item.dart';
+import 'package:valuation_tool_web/presentation/pages/HelpPage.dart';
+import 'package:valuation_tool_web/presentation/pages/ProfilePage.dart';
+import 'package:valuation_tool_web/presentation/pages/SettingsPage.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details.dart';
+import 'package:valuation_tool_web/presentation/pages/vin_page.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_vehicle_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/folder_menu_item.dart';
+import 'package:valuation_tool_web/presentation/widgets/side_menu_item.dart';
+import 'package:valuation_tool_web/presentation/widgets/side_sub_menu_item.dart';
+import 'package:valuation_tool_web/presentation/widgets/vehicle_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.page, this.extra})
@@ -196,8 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           folderItemList = state.list;
                         } else if (state is AddFolderLoadingState) {
                           return CircularProgressIndicator();
-                        } else if (state is GetFoldersLoadingState) {
-                          return CircularProgressIndicator();
                         }
                         return Container(
                           height: screenSize.height * .3,
@@ -324,8 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   VehicleList(
                       onItemSelect: (String vin) {
-                        Navigator.pushNamed(context, '/main/details/$vin',
-                            arguments: VehicleDetailsArgs(null));
+                        Navigator.pushNamed(context, '/main/details',
+                            arguments: VehicleDetailsArgs(
+                                vin: vin, mileage: null, uvc: null));
                       },
                       onAddButtonClicked: () {
                         _showDialogModal(context);
@@ -333,17 +330,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       folder: folderFilter),
                   VehicleList(
                       onItemSelect: (String vin) {
-                        Navigator.pushNamed(context, '/main/details/$vin',
-                            arguments: VehicleDetailsArgs(null));
+                        Navigator.pushNamed(context, '/main/details',
+                            arguments: VehicleDetailsArgs(
+                                vin: vin, mileage: null, uvc: null));
                       },
                       onAddButtonClicked: () {
                         _showDialogModal(context);
                       },
                       folder: folderFilter),
-                  VehicleDetails(widget.extra ?? '', onAddSuccess: () {
-                    BlocProvider.of<VehicleListBloc>(context).getVehicleList();
-                    folderBloc.getAllFolder();
-                  }),
+                  VehicleDetails(
+                    onAddSuccess: () {
+                      BlocProvider.of<VehicleListBloc>(context)
+                          .getVehicleList();
+                      folderBloc.getAllFolder();
+                    },
+                  ),
                   Profile(),
                   Settings(),
                   Help(),
@@ -501,16 +502,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showDialogModal(BuildContext context) async {
     showGeneralDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
+      barrierLabel: '',
       transitionDuration: const Duration(milliseconds: 0),
       context: context,
       pageBuilder: (BuildContext context, anim1, anim2) {
         return Align(
             alignment: Alignment.center,
             child: AddVehicleModalBody(
-              onDataFound: (String vin, String mileage) {
-                Navigator.pushNamed(context, '/main/${pages[2]}/$vin',
-                    arguments: VehicleDetailsArgs(mileage));
+              onDataFound: (String vin, String mileage, String categoryUVC) {
+                Navigator.pushNamed(context, '/main/${pages[2]}',
+                    arguments: VehicleDetailsArgs(
+                        mileage: mileage, vin: vin, uvc: categoryUVC));
               },
             ));
       },
