@@ -32,7 +32,7 @@ class FirestoreFolderService {
       return value.id;
     }).catchError((e) {
       isSuccess = false;
-      print('SAVING error: ${e.toString()}');
+      print(' error: ${e.toString()}');
     });
     await _collectionReference
         .doc(id)
@@ -41,9 +41,21 @@ class FirestoreFolderService {
     return isSuccess;
   }
 
-  Future<FolderItem> getFolderData(String email) async {
+  Future<bool> deleteFolder({required FolderItem folderItem}) async {
+    bool isSuccess = false;
+    await _collectionReference.doc(folderItem.id).delete().then((value) {
+      isSuccess = true;
+    }).catchError((e) {
+      isSuccess = false;
+      print(' error: ${e.toString()}');
+    });
+
+    return isSuccess;
+  }
+
+  Future<FolderItem> getFolderData({required String folderName}) async {
     FolderItem folderItem = await _collectionReference
-        .where('user', isEqualTo: email)
+        .where('folderName', isEqualTo: folderName)
         .get()
         .then((value) => value.docs.first.data() as FolderItem);
 

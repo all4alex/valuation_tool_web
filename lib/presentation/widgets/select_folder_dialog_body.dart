@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
 import 'package:valuation_tool_web/models/firestore/folder_item.dart';
@@ -17,10 +18,13 @@ class SelectFolderDialogBody extends StatefulWidget {
 
 class _SelectFolderDialogBodyState extends State<SelectFolderDialogBody> {
   late FolderBloc folderBloc;
+  late AddToFolderBloc addToFolderBloc;
+
   @override
   void initState() {
     folderBloc = BlocProvider.of<FolderBloc>(context);
-    folderBloc.getAllFolder();
+    addToFolderBloc = BlocProvider.of<AddToFolderBloc>(context);
+    folderBloc.getAllFolderFromDialog();
     super.initState();
   }
 
@@ -29,19 +33,19 @@ class _SelectFolderDialogBodyState extends State<SelectFolderDialogBody> {
     return BlocBuilder<FolderBloc, FolderState>(
         builder: (BuildContext context, FolderState state) {
       List<Widget> listOfFolder = <Widget>[];
-      if (state is GetFoldersLoadingState) {
+      if (state is GetFoldersFromDialogLoadingState) {
         return SimpleDialog(title: Text('Select folder'), children: [
           SimpleDialogOption(
               onPressed: null, child: Text('Loding folders... Please wait.'))
         ]);
-      } else if (state is GetFoldersSuccessState) {
+      } else if (state is GetFoldersFromDialogSuccessState) {
         listOfFolder = state.list.map((e) {
           return DialogFolderItem(
             icon: Icons.folder,
             color: Colors.orange,
             text: e.folderName,
             onPressed: () {
-              folderBloc.addToFolder(
+              addToFolderBloc.addToFolder(
                   folderName: e.folderName!, id: widget.vehicleItem.id!);
               Navigator.pop(context, e.folderName);
             },

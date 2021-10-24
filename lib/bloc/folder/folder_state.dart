@@ -32,6 +32,26 @@ class AddFolderLoadingState extends FolderState {
   List<Object> get props => <Object>[];
 }
 
+//for dialogs
+class GetFoldersFromDialogLoadingState extends FolderState {
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class GetFoldersFromDialogSuccessState extends FolderState {
+  GetFoldersFromDialogSuccessState({required this.list});
+  final List<FolderItem> list;
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class GetFoldersFromDialogFailedState extends FolderState {
+  GetFoldersFromDialogFailedState({required this.error});
+  final String error;
+  @override
+  List<Object> get props => <Object>[];
+}
+
 class AddFolderSuccessState extends FolderState {
   AddFolderSuccessState();
   @override
@@ -45,20 +65,19 @@ class AddFolderFailedState extends FolderState {
   List<Object> get props => <Object>[];
 }
 
-class AddToFolderLoadingState extends FolderState {
+class DeleteFolderLoadingState extends FolderState {
   @override
   List<Object> get props => <Object>[];
 }
 
-class AddToFolderSuccessState extends FolderState {
-  AddToFolderSuccessState({required this.folderName});
-  final String folderName;
+class DeleteFolderSuccessState extends FolderState {
+  DeleteFolderSuccessState();
   @override
   List<Object> get props => <Object>[];
 }
 
-class AddToFolderFailedState extends FolderState {
-  AddToFolderFailedState({required this.error});
+class DeleteFolderFailedState extends FolderState {
+  DeleteFolderFailedState({required this.error});
   final String error;
   @override
   List<Object> get props => <Object>[];

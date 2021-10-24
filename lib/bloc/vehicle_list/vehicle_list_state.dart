@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 
@@ -15,8 +16,10 @@ class VehicleListLoadingState extends VehicleListState {
 }
 
 class VehicleListSuccessState extends VehicleListState {
-  VehicleListSuccessState({required this.list});
+  VehicleListSuccessState({required this.list, this.folderItem});
   final List<VehicleItem> list;
+  final FolderItem? folderItem;
+
   @override
   List<Object> get props => <Object>[];
 }

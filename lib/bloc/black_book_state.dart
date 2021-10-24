@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
+import 'package:valuation_tool_web/presentation/view_models/vehicle_highlights_vm.dart';
 
 abstract class BlackBookState extends Equatable {}
 
@@ -18,10 +19,12 @@ class BlackBookSuccessState extends BlackBookState {
   BlackBookSuccessState(
       {required this.vehicleResponse,
       required this.vehicleName,
-      required this.vehicleItem});
+      required this.vehicleItem,
+      required this.highlightsList});
   final VehicleResponse vehicleResponse;
   final String vehicleName;
   final VehicleItem vehicleItem;
+  final List<VehicleHighlightsVM> highlightsList;
   @override
   List<Object> get props => <Object>[];
 }

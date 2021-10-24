@@ -6,8 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
 import 'package:valuation_tool_web/bloc/black_book_state.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
 import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_bloc.dart';
 import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_state.dart';
+import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 
@@ -23,7 +26,8 @@ class VehicleList extends StatefulWidget {
       {Key? key,
       required this.onItemSelect,
       required this.onAddButtonClicked,
-      required this.folder
+      required this.folder,
+      required this.onFolderDeleted
       // required this.title,
       // required this.subTitle,
       // required this.vin,
@@ -35,6 +39,7 @@ class VehicleList extends StatefulWidget {
   final Function onItemSelect;
   final Function onAddButtonClicked;
   final String folder;
+  final Function onFolderDeleted;
   @override
   State<VehicleList> createState() => _VehicleListState();
 }
@@ -42,13 +47,16 @@ class VehicleList extends StatefulWidget {
 class _VehicleListState extends State<VehicleList> {
   late List<VehicleItem> vehicleItemList = <VehicleItem>[];
   late VehicleListBloc vehicleListBloc;
-  late VehicleListArgs args;
+  late FolderBloc folderBloc;
+
+  late VehicleListArgs args = VehicleListArgs('All Vehicles');
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
       args = ModalRoute.of(context)!.settings.arguments as VehicleListArgs;
       vehicleListBloc = BlocProvider.of<VehicleListBloc>(context);
-      if (args.folder == 'all') {
+      folderBloc = BlocProvider.of<FolderBloc>(context);
+      if (args.folder == 'All Vehicles' || args.folder == 'Initial') {
         vehicleListBloc.getVehicleList();
       } else {
         vehicleListBloc.getVehicleListPerFolder(folderName: args.folder!);
@@ -60,237 +68,325 @@ class _VehicleListState extends State<VehicleList> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    return Container(
-      height: screenSize.height,
-      width: screenSize.width / 1.4,
-      margin: const EdgeInsets.only(top: 10, bottom: 10, left: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xffF3F3F3),
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-              color: Colors.grey,
-              offset: Offset(0.0, 1.0), //(x,y)
-              blurRadius: 6.0,
-              spreadRadius: 0),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-              height: 60,
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text('All Vehicles'),
-                  BlocBuilder<VehicleListBloc, VehicleListState>(
-                      builder: (BuildContext context, VehicleListState state) {
-                    String count = '0';
-                    if (state is VehicleListSuccessState) {
-                      count = state.list.length.toString();
-                    }
-                    return Text(' $count', style: TextStyle(color: Colors.red));
-                  }),
-                  VerticalDivider(),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                          height: 15,
-                          width: 30,
-                          child: SvgPicture.asset(
-                              'assets/svg/vehicle_add_icon.svg',
-                              fit: BoxFit.fitHeight)),
-                      TextButton(
-                          onPressed: () {
-                            widget.onAddButtonClicked();
-                          },
-                          child:
-                              Text('Add Vehicle', textAlign: TextAlign.center))
-                    ],
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: 15,
-                        width: 15,
-                        alignment: Alignment.bottomRight,
-                        padding: EdgeInsets.zero,
-                        child:
-                            SvgPicture.asset('assets/svg/sort_desc_icon.svg'),
-                      )),
-                ],
-              )),
-          const Divider(height: 0),
-          Expanded(
-              flex: 1,
-              child: BlocBuilder<VehicleListBloc, VehicleListState>(
-                  builder: (BuildContext context, VehicleListState state) {
-                if (state is VehicleListLoadingState) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (state is VehicleListFailedState) {
-                  return Center(child: Text('List is empty'));
-                } else if (state is VehicleListSuccessState) {
-                  vehicleItemList = state.list;
-                }
-                return ListView.builder(
-                    itemCount: vehicleItemList.length,
-                    itemBuilder: (BuildContext context, int i) {
-                      VehicleItem vehicleItem = vehicleItemList[i];
-                      return InkWell(
-                        onTap: () {
-                          widget.onItemSelect(vehicleItem.vin);
-                        },
+    return BlocBuilder<VehicleListBloc, VehicleListState>(
+        builder: (BuildContext context, VehicleListState state) {
+      String vehicleCount = '';
+      String folderName = '';
+      FolderItem? folderItem;
+      if (state is VehicleListLoadingState) {
+        return Center(child: CircularProgressIndicator());
+      } else if (state is VehicleListFailedState) {
+        return Center(child: Text('List is empty'));
+      } else if (state is VehicleListSuccessState) {
+        vehicleCount = '(${state.list.length})';
+        vehicleItemList = state.list;
+        folderItem = state.folderItem;
+      }
+      return Container(
+        height: screenSize.height,
+        width: screenSize.width / 1.4,
+        margin: const EdgeInsets.only(top: 10, bottom: 10, left: 20),
+        decoration: const BoxDecoration(
+          color: Color(0xffF3F3F3),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0.0, 1.0), //(x,y)
+                blurRadius: 6.0,
+                spreadRadius: 0),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+                height: 60,
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${args.folder}: '),
+                    Text(vehicleCount, style: TextStyle(color: Colors.red)),
+                    VerticalDivider(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                            height: 15,
+                            width: 30,
+                            child: SvgPicture.asset(
+                                'assets/svg/vehicle_add_icon.svg',
+                                fit: BoxFit.fitHeight)),
+                        TextButton(
+                            onPressed: () {
+                              widget.onAddButtonClicked();
+                            },
+                            child: Text('Add Vehicle',
+                                textAlign: TextAlign.center)),
+                      ],
+                    ),
+                    Visibility(
+                      visible: args.folder != 'All Vehicles',
+                      child: Row(children: [
+                        VerticalDivider(),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                                width: 30,
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.center,
+                                child: Icon(Icons.edit,
+                                    size: 20, color: Colors.blue)),
+                            TextButton(
+                                onPressed: () {
+                                  // widget.onAddButtonClicked();
+                                },
+                                child: Text('Rename Folder',
+                                    textAlign: TextAlign.center)),
+                          ],
+                        ),
+                        VerticalDivider(),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                                width: 30,
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.center,
+                                child: Icon(Icons.delete,
+                                    size: 20, color: Colors.red)),
+                            TextButton(
+                                onPressed: () {
+                                  if (folderItem != null) {
+                                    _showDeleteDialog(
+                                        context, folderItem, vehicleItemList);
+                                  }
+                                },
+                                child: Text('Delete Folder',
+                                    textAlign: TextAlign.center)),
+                          ],
+                        ),
+                      ]),
+                    ),
+                    Expanded(
+                        flex: 1,
                         child: Container(
-                            padding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Container(
-                                      width: screenSize.width * .2,
-                                      alignment: Alignment.centerLeft,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Container(
-                                              height: 68,
-                                              width: 100,
-                                              decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xffF3F3F3),
-                                                  border: Border.all(
-                                                      width: 1,
-                                                      style: BorderStyle.solid,
-                                                      color: Colors.black)),
-                                              child: CachedNetworkImage(
-                                                fit: BoxFit.fitHeight,
-                                                imageUrl:
-                                                    '${vehicleItem.imageUrl}_200x200',
-                                              )),
-                                          const SizedBox(width: 10),
-                                          Container(
-                                            width: screenSize.width * .1,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(vehicleItem.name!,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        overflow:
-                                                            TextOverflow.clip,
-                                                        fontSize: 14)),
-                                                Text(vehicleItem.subName!,
-                                                    style: TextStyle(
-                                                        fontSize: 10,
-                                                        color:
-                                                            Color(0xff898989))),
-                                              ],
+                          height: 15,
+                          width: 15,
+                          alignment: Alignment.bottomRight,
+                          padding: EdgeInsets.zero,
+                          child:
+                              SvgPicture.asset('assets/svg/sort_desc_icon.svg'),
+                        )),
+                  ],
+                )),
+            const Divider(height: 0),
+            BlocListener<FolderBloc, FolderState>(
+                listener: (BuildContext context, FolderState state) {
+              if (state is DeleteFolderSuccessState) {
+                widget.onFolderDeleted();
+              } else if (state is DeleteFolderFailedState) {
+                _showDeleteFailedDialog(context);
+              }
+            }, child: BlocBuilder<FolderBloc, FolderState>(
+                    builder: (BuildContext context, FolderState state) {
+              if (state is DeleteFolderLoadingState) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return Expanded(
+                  flex: 1,
+                  child: ListView.builder(
+                      itemCount: vehicleItemList.length,
+                      itemBuilder: (BuildContext context, int i) {
+                        VehicleItem vehicleItem = vehicleItemList[i];
+                        return InkWell(
+                          onTap: () {
+                            widget.onItemSelect(vehicleItem.vin);
+                          },
+                          child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 10),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Container(
+                                        width: screenSize.width * .2,
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                                height: 68,
+                                                width: 100,
+                                                decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xffF3F3F3),
+                                                    border: Border.all(
+                                                        width: 1,
+                                                        style:
+                                                            BorderStyle.solid,
+                                                        color: Colors.black)),
+                                                child: CachedNetworkImage(
+                                                  fit: BoxFit.fitHeight,
+                                                  imageUrl:
+                                                      '${vehicleItem.imageUrl}_200x200',
+                                                  errorWidget: (context, url,
+                                                          error) =>
+                                                      Image.asset(
+                                                          'assets/images/no_image.jpeg'),
+                                                )),
+                                            const SizedBox(width: 10),
+                                            Container(
+                                              width: screenSize.width * .1,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Text(vehicleItem.name!,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          overflow:
+                                                              TextOverflow.clip,
+                                                          fontSize: 14)),
+                                                  Text(vehicleItem.subName!,
+                                                      style: TextStyle(
+                                                          fontSize: 10,
+                                                          color: Color(
+                                                              0xff898989))),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      width: screenSize.width * .13,
-                                      alignment: Alignment.centerLeft,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(vehicleItem.vin!),
-                                          SizedBox(
-                                              height: 15,
-                                              width: 30,
-                                              child: SvgPicture.asset(
-                                                  'assets/svg/copy_icon.svg',
-                                                  color: Colors.green,
-                                                  fit: BoxFit.fitHeight)),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                        width: screenSize.width * .08,
+                                      Container(
+                                        width: screenSize.width * .13,
                                         alignment: Alignment.centerLeft,
-                                        child: Text(
-                                            '${vehicleItem.miles} miles',
-                                            style: TextStyle(
-                                                overflow: TextOverflow.clip))),
-                                    Container(
-                                        width: screenSize.width * .08,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('${vehicleItem.addedDate}',
-                                            style: TextStyle(
-                                                overflow: TextOverflow.clip))),
-                                    Container(
-                                      width: screenSize.width * .12,
-                                      alignment: Alignment.centerLeft,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                              height: 15,
-                                              width: 30,
-                                              child: SvgPicture.asset(
-                                                  'assets/svg/folder_icon.svg',
-                                                  color: Color(0xff36334E),
-                                                  fit: BoxFit.fitHeight)),
-                                          SizedBox(
-                                            width: screenSize.width * .09,
-                                            child: Text('${vehicleItem.folder}',
-                                                style: TextStyle(
-                                                    overflow:
-                                                        TextOverflow.clip)),
-                                          )
-                                        ],
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(vehicleItem.vin!),
+                                            SizedBox(
+                                                height: 15,
+                                                width: 30,
+                                                child: SvgPicture.asset(
+                                                    'assets/svg/copy_icon.svg',
+                                                    color: Colors.green,
+                                                    fit: BoxFit.fitHeight)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                        height: 15,
-                                        width: 20,
-                                        child: SvgPicture.asset(
-                                            'assets/svg/preference_icon.svg',
-                                            color: Color(0xff494949),
-                                            fit: BoxFit.fitHeight)),
-                                  ],
-                                ),
-                                const Divider()
-                              ],
-                            )),
-                      );
-                    });
-              })),
-        ],
-      ),
-    );
+                                      Container(
+                                          width: screenSize.width * .08,
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                              '${vehicleItem.miles} miles',
+                                              style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.clip))),
+                                      Container(
+                                          width: screenSize.width * .08,
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                              '${vehicleItem.addedDate}',
+                                              style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.clip))),
+                                      Container(
+                                        width: screenSize.width * .12,
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                                height: 15,
+                                                width: 30,
+                                                child: SvgPicture.asset(
+                                                    'assets/svg/folder_icon.svg',
+                                                    color: Color(0xff36334E),
+                                                    fit: BoxFit.fitHeight)),
+                                            SizedBox(
+                                              width: screenSize.width * .09,
+                                              child: Text(
+                                                  '${vehicleItem.folder}',
+                                                  style: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.clip)),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          height: 15,
+                                          width: 20,
+                                          child: SvgPicture.asset(
+                                              'assets/svg/preference_icon.svg',
+                                              color: Color(0xff494949),
+                                              fit: BoxFit.fitHeight)),
+                                    ],
+                                  ),
+                                  const Divider()
+                                ],
+                              )),
+                        );
+                      }));
+            })),
+          ],
+        ),
+      );
+    });
   }
 
-  void _showDialogModal(BuildContext context) async {
-    showGeneralDialog(
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 0),
-      context: context,
-      pageBuilder: (BuildContext context, anim1, anim2) {
-        return Align(
-            alignment: Alignment.center,
-            child: AddVehicleModalBody(
-              onDataFound: (String vin, String mileage, String uvc) {},
-            ));
-      },
-      transitionBuilder:
-          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
-        return SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
-                  .animate(anim1),
-          child: child,
-        );
-      },
-    );
+  void _showDeleteDialog(BuildContext context, FolderItem folderItem,
+      List<VehicleItem> vehicleItemList) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete folder?'),
+            content: Text(
+                'This will delete all vehicles under this folder. But you can still see them on All Vehicles list.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  folderBloc.deleteFolder(
+                      folderItem: folderItem, vehicleItemList: vehicleItemList);
+                },
+                child: Text('DELETE'),
+              ),
+            ],
+          );
+        });
+  }
+
+  void _showDeleteFailedDialog(BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete folder failed!'),
+            content: Text('Unable to delete folder'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        });
   }
 }

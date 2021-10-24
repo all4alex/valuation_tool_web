@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:valuation_tool_web/bloc/category_search/category_search_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
 import 'package:valuation_tool_web/repository/black_book_vehicle_repository.dart';
@@ -34,6 +35,8 @@ Future<void> main() async {
     BlocProvider<VehicleListBloc>(
         create: (BuildContext context) => VehicleListBloc()),
     BlocProvider<FolderBloc>(create: (BuildContext context) => FolderBloc()),
+    BlocProvider<AddToFolderBloc>(
+        create: (BuildContext context) => AddToFolderBloc()),
     BlocProvider<UploadImageBloc>(
         create: (BuildContext context) => UploadImageBloc()),
   ], child: const App()));

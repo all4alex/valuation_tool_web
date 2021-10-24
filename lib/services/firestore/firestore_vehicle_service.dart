@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;

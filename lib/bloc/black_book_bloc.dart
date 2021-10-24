@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
+import 'package:valuation_tool_web/models/retail_statistics_response.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
+import 'package:valuation_tool_web/presentation/view_models/vehicle_highlights_vm.dart';
 import 'package:valuation_tool_web/repository/black_book_vehicle_repository.dart';
 import 'package:valuation_tool_web/services/firestore/firestore_vehicle_service.dart';
 
@@ -16,21 +18,37 @@ class BlackBookBloc extends Cubit<BlackBookState> {
 
   final BlackBookRepository blackBookRepository;
   FirestoreVehicleService _firestoreVehicleService = FirestoreVehicleService();
+  void reInit() {
+    emit(BlackBookLoadingState());
+  }
 
-  void getVehiclDataByVin({String? vin, String? uvc, String? mileage}) async {
+  void getVehiclDataByVin(
+      {String? vin, String? uvc, String? mileage, bool? isNew}) async {
     emit(BlackBookLoadingState());
     try {
       VehicleResponse vehicleResponse;
-      print('THE VIN: $vin');
-      print('THE VIN: $uvc');
+      RetailStatisticsResponse retailStatisticsResponse;
+      String miles = '';
+      if (isNew!) {
+        miles = mileage!;
+      } else {
+        miles = await _firestoreVehicleService
+            .getVehicleData(vin!, 'alex.ayso@valuation.com')
+            .then((value) => value.miles!);
+      }
 
       if (vin!.isNotEmpty) {
         vehicleResponse = await blackBookRepository.getVehicleByVin(vin: vin);
+        retailStatisticsResponse = await blackBookRepository
+            .searchRetailStatsByVIN(vin: vin, mileage: miles, zipcode: '84101');
       } else {
         vehicleResponse = await blackBookRepository.getVehicleByUvc(uvc: uvc!);
+        retailStatisticsResponse = await blackBookRepository
+            .searchRetailStatsByUVC(uvc: uvc, mileage: miles, zipcode: '84101');
       }
-      print(
-          'THE DATA: ${vehicleResponse.usedVehicles!.usedVehicleList![0].msrp}');
+      List<VehicleHighlightsVM> highlightsList =
+          _getVehicleHighlights(retailStatisticsResponse, vehicleResponse);
+
       UsedVehicles usedVehicleListItem = vehicleResponse.usedVehicles!;
       String year =
           usedVehicleListItem.usedVehicleList![0].modelYear.toString();
@@ -38,13 +56,13 @@ class BlackBookBloc extends Cubit<BlackBookState> {
       String model = usedVehicleListItem.usedVehicleList![0].model.toString();
       String vehicleName = '$year $make $model';
       //save to firestore
-      if (mileage != null) {
+      if (isNew) {
         await _addVehicleToFirestore(
             vehicleResponse,
             vin.isNotEmpty
                 ? vin
                 : vehicleResponse.usedVehicles!.usedVehicleList![0].vin!,
-            mileage);
+            miles);
       }
       VehicleItem vehicleItem = await _firestoreVehicleService.getVehicleData(
           vin.isNotEmpty
@@ -55,10 +73,13 @@ class BlackBookBloc extends Cubit<BlackBookState> {
       emit(BlackBookSuccessState(
           vehicleResponse: vehicleResponse,
           vehicleName: vehicleName,
-          vehicleItem: vehicleItem));
+          vehicleItem: vehicleItem,
+          highlightsList: highlightsList));
     } on DioError catch (e) {
+      print(e.error);
       emit(BlackBookFailedState(error: e.response!.data));
     } catch (e) {
+      print('THE ERROR: $e');
       emit(BlackBookFailedState(error: e.toString()));
     }
   }
@@ -90,4 +111,40 @@ class BlackBookBloc extends Cubit<BlackBookState> {
 
     return _firestoreVehicleService.addVehicle(vehicleItem: vehicleItem);
   }
+}
+
+List<VehicleHighlightsVM> _getVehicleHighlights(
+    RetailStatisticsResponse retailStatisticsResponse,
+    VehicleResponse vehicleResponse) {
+  List<VehicleHighlightsVM> list = <VehicleHighlightsVM>[];
+  final formatCurrency = new NumberFormat.simpleCurrency(decimalDigits: 0);
+
+  list.add(VehicleHighlightsVM(
+      isPositive: false, description: 'Error loading CARFAX™ report'));
+
+  double retailPrice = vehicleResponse
+      .usedVehicles!.usedVehicleList![0].baseRetailAvg! as double;
+  double wholesalePrice =
+      vehicleResponse.usedVehicles!.usedVehicleList![0].baseWholeAvg as double;
+  double narrowSpread = retailPrice - wholesalePrice;
+
+  String spread = formatCurrency.format(narrowSpread);
+
+  list.add(VehicleHighlightsVM(
+      isPositive: true,
+      description:
+          'Narrow spread between wholesale and retail values: $spread'));
+  list.add(VehicleHighlightsVM(
+      isPositive: true,
+      description:
+          'Average mileage: ${retailStatisticsResponse.listingsStatistics!.activeStatistics!.meanMileage}'));
+  list.add(VehicleHighlightsVM(
+      isPositive: true,
+      description:
+          'Days to turn: ${retailStatisticsResponse.listingsStatistics!.meanDaysToTurn}'));
+  list.add(VehicleHighlightsVM(
+      isPositive: true,
+      description:
+          'Days supply: ${retailStatisticsResponse.listingsStatistics!.marketDaysSupply}'));
+  return list;
 }

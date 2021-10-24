@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:valuation_tool_web/routes.dart';
+import 'package:valuation_tool_web/utils/app_scroll_behavior.dart';
+
+import 'presentation/pages/vehicle_details.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -20,9 +23,32 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'Carketa Valuation Web',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: AppScrollBehavior(),
       initialRoute: '/',
       onGenerateRoute: Flurorouter.router.generator,
+      // home: VehicleDetails(onAddSuccess: () {}),
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
     );
+  }
+}
+
+class TestScreen extends StatefulWidget {
+  @override
+  State<TestScreen> createState() => _TestScreenState();
+}
+
+class _TestScreenState extends State<TestScreen> {
+  @override
+  void initState() {
+    Navigator.pushNamed(
+      context,
+      '/main/details',
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
