@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
-import 'package:valuation_tool_web/presentation/view_models/vehicle_highlights_vm.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/view_models/vehicle_highlights_vm.dart';
 
 abstract class BlackBookState extends Equatable {}
 

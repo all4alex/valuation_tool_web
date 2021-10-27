@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
-import 'package:valuation_tool_web/bloc/black_book_state.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
 import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_bloc.dart';
@@ -14,7 +12,7 @@ import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 
-import 'add_vehicle_modal_body.dart';
+import '../widgets/add_vehicle_modal_body.dart';
 
 class VehicleListArgs {
   VehicleListArgs(this.folder);

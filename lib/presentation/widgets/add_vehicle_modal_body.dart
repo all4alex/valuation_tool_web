@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
-import 'package:valuation_tool_web/bloc/black_book_state.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 
 import 'category_search.dart';
@@ -28,9 +27,39 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
       ElevatedButton.styleFrom(primary: const Color(0xffD9DBE1), elevation: 0);
   bool isVinSearch = true;
   String categoryUVC = '';
+  late FToast fToast;
+
   @override
   void initState() {
+    fToast = FToast();
+    fToast.init(context);
     super.initState();
+  }
+
+  void showErrorToast(String message) {
+    Widget toastBody = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.red,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.error, color: Colors.white),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(message, style: TextStyle(color: Colors.white)),
+        ],
+      ),
+    );
+
+    fToast.showToast(
+      child: toastBody,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 
   @override
@@ -265,9 +294,19 @@ class _AddVehicleModalBodyState extends State<AddVehicleModalBody> {
 
                                   String mileage =
                                       mileageTextEditingController.text;
-                                  Navigator.pop(context);
-                                  widget.onDataFound(
-                                      inputedVin, mileage, categoryUVC);
+
+                                  if (inputedVin.length != 17 && isVinSearch) {
+                                    showErrorToast('Vin is not valid');
+                                  } else if (inputedVin.isEmpty &&
+                                      isVinSearch) {
+                                    showErrorToast('Please input a VIN');
+                                  } else if (mileage.isEmpty) {
+                                    showErrorToast('Please input a Mileage');
+                                  } else {
+                                    Navigator.pop(context);
+                                    widget.onDataFound(
+                                        inputedVin, mileage, categoryUVC);
+                                  }
                                 },
                                 child: Container(
                                   width: 220,

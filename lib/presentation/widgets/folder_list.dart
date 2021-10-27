@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
 import 'package:valuation_tool_web/models/firestore/folder_item.dart';
-import 'package:valuation_tool_web/presentation/widgets/vehicle_list.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_list.dart';
 
 import 'folder_menu_item.dart';
 

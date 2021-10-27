@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'widgets/vehicle_list.dart';
+import 'pages/vehicle_list.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

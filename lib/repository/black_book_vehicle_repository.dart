@@ -3,8 +3,8 @@ import 'package:valuation_tool_web/models/blackbook/make_by_year_response.dart';
 import 'package:valuation_tool_web/models/blackbook/vehicle_by_make_response.dart';
 import 'package:valuation_tool_web/models/retail_statistics_response.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
-import 'package:valuation_tool_web/services/api_interceptor.dart';
-import 'package:valuation_tool_web/services/black_book_vehicle_api_service.dart';
+import 'package:valuation_tool_web/app/utils/api/api_interceptor.dart';
+import 'package:valuation_tool_web/services/blackbook/black_book_vehicle_api_service.dart';
 
 abstract class BlackBookRepository {
   Future<VehicleResponse> getVehicleByVin({
@@ -67,13 +67,13 @@ class BlackBookRepositoryImpl implements BlackBookRepository {
   Future<RetailStatisticsResponse> searchRetailStatsByUVC(
       {required String uvc, required String mileage, required String zipcode}) {
     return _apiService.searchRetailStatsByUVC(
-        uvc: uvc, maximum_mileage: mileage, zipcode: zipcode);
+        uvc: uvc, maximumMileage: mileage, zipcode: zipcode);
   }
 
   @override
   Future<RetailStatisticsResponse> searchRetailStatsByVIN(
       {required String vin, required String mileage, required String zipcode}) {
     return _apiService.searchRetailStatsByVIN(
-        vin: vin, maximum_mileage: mileage, zipcode: zipcode);
+        vin: vin, maximumMileage: mileage, zipcode: zipcode);
   }
 }

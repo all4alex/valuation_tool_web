@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:valuation_tool_web/presentation/view_models/vehicle_highlights_vm.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/view_models/vehicle_highlights_vm.dart';
 
 class VehicleHighlightsOverview extends StatelessWidget {
   VehicleHighlightsOverview({required this.highlightsList});

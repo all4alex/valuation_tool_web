@@ -23,14 +23,14 @@ abstract class BlackBookVehicleApiService {
   @GET('/RetailAPI/RetailAPI/ListingsStatistics')
   Future<RetailStatisticsResponse> searchRetailStatsByVIN({
     @Query('vin') required String vin,
-    @Query('mileage') required String maximum_mileage,
+    @Query('maximum_mileage') required String maximumMileage,
     @Query('zipcode') required String zipcode,
   });
 
   @GET('RetailAPI/RetailAPI/ListingsStatistics')
   Future<RetailStatisticsResponse> searchRetailStatsByUVC({
     @Query('uvc') required String uvc,
-    @Query('mileage') required String maximum_mileage,
+    @Query('maximum_mileage') required String maximumMileage,
     @Query('zipcode') required String zipcode,
   });
 

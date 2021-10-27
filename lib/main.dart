@@ -7,8 +7,8 @@ import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
 import 'package:valuation_tool_web/repository/black_book_vehicle_repository.dart';
-import 'app.dart';
-import 'bloc/black_book_bloc.dart';
+import 'app/app.dart';
+import 'bloc/black_book/black_book_bloc.dart';
 import 'bloc/vehicle_list/vehicle_list_bloc.dart';
 
 List<String> pages = [

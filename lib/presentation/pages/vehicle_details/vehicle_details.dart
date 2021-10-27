@@ -8,8 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:valuation_tool_web/bloc/black_book_bloc.dart';
-import 'package:valuation_tool_web/bloc/black_book_state.dart';
+import 'package:valuation_tool_web/bloc/black_book/black_book_bloc.dart';
+import 'package:valuation_tool_web/bloc/black_book/black_book_state.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
 import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
@@ -19,12 +19,7 @@ import 'package:valuation_tool_web/models/add_deduct_list.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/blackbook_values.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/vehicle_basic_info.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/vehicle_detailed_info.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/vehicle_details_actions.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/vehicle_highlights_overview.dart';
-import 'package:valuation_tool_web/presentation/vehicle_details/widgets/vehicle_price_overview.dart';
+
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_retail_data.dart';
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_trade_in_data.dart';
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_wholesale_data.dart';
@@ -33,6 +28,13 @@ import 'package:valuation_tool_web/presentation/widgets/page_view.dart';
 import 'package:valuation_tool_web/presentation/widgets/select_folder_dialog_body.dart';
 import 'package:valuation_tool_web/services/firestore/firestore_vehicle_service.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import 'widgets/blackbook_values.dart';
+import 'widgets/vehicle_basic_info.dart';
+import 'widgets/vehicle_detailed_info.dart';
+import 'widgets/vehicle_details_actions.dart';
+import 'widgets/vehicle_highlights_overview.dart';
+import 'widgets/vehicle_price_overview.dart';
 
 enum VehicleQuality { rough, average, clean }
 

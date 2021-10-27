@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:valuation_tool_web/app/utils/app_scroll_behavior.dart';
 import 'package:valuation_tool_web/routes.dart';
-import 'package:valuation_tool_web/utils/app_scroll_behavior.dart';
-
-import 'presentation/pages/vehicle_details.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);

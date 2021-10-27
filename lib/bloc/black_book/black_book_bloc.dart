@@ -6,7 +6,7 @@ import 'package:valuation_tool_web/models/retail_statistics_response.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
-import 'package:valuation_tool_web/presentation/view_models/vehicle_highlights_vm.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/view_models/vehicle_highlights_vm.dart';
 import 'package:valuation_tool_web/repository/black_book_vehicle_repository.dart';
 import 'package:valuation_tool_web/services/firestore/firestore_vehicle_service.dart';
 
