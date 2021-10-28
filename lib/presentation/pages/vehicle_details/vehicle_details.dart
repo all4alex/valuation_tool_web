@@ -19,6 +19,9 @@ import 'package:valuation_tool_web/models/add_deduct_list.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/models/used_vehicles.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/retail_and_profit.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_activity.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_notes.dart';
 
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_retail_data.dart';
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_trade_in_data.dart';
@@ -39,11 +42,13 @@ import 'widgets/vehicle_price_overview.dart';
 enum VehicleQuality { rough, average, clean }
 
 class VehicleDetailsArgs {
-  VehicleDetailsArgs({this.mileage, this.vin, this.uvc, this.isNew});
+  VehicleDetailsArgs(
+      {this.mileage, this.vin, this.uvc, this.isNew, this.folderName});
   final String? mileage;
   final String? vin;
   final String? uvc;
   final bool? isNew;
+  final String? folderName;
 }
 
 class VehicleDetails extends StatefulWidget {
@@ -71,14 +76,15 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     Future.delayed(Duration.zero, () {
       args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
       // args = VehicleDetailsArgs(
-      //     vin: 'JM1GL1VM5M1607776', uvc: null, mileage: '200');
+      //     vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
 
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc.getVehiclDataByVin(
           vin: args.vin,
           uvc: args.uvc,
           mileage: args.mileage,
-          isNew: args.isNew);
+          isNew: args.isNew,
+          folderName: args.folderName);
       folderBloc = BlocProvider.of<FolderBloc>(context);
     });
 
@@ -170,6 +176,14 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                       VehicleDetailedInfo(
                           usedVehicleListItem: usedVehicleListItem,
                           mileage: state.vehicleItem.miles!),
+                      const SizedBox(height: 15),
+                      VehicleNotes(
+                        email: 'alex.ayso04@gmail.com',
+                      ),
+                      const SizedBox(height: 15),
+                      VehicleActivity(
+                        email: 'alex.ayso04@gmail.com',
+                      ),
                     ],
                   ),
                   Column(
@@ -178,6 +192,10 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                       VehicleDetailsActions(
                         folderName: folderName,
                         vehicleItem: vehicleItem,
+                      ),
+                      const SizedBox(height: 15),
+                      RetailAndProfit(
+                        usedVehicleListItem: usedVehicleListItem,
                       ),
                       BlackBookValues(
                         title: '$year $make $model',

@@ -23,7 +23,11 @@ class BlackBookBloc extends Cubit<BlackBookState> {
   }
 
   void getVehiclDataByVin(
-      {String? vin, String? uvc, String? mileage, bool? isNew}) async {
+      {String? vin,
+      String? uvc,
+      String? mileage,
+      bool? isNew,
+      String? folderName}) async {
     emit(BlackBookLoadingState());
     try {
       VehicleResponse vehicleResponse;
@@ -62,7 +66,8 @@ class BlackBookBloc extends Cubit<BlackBookState> {
             vin.isNotEmpty
                 ? vin
                 : vehicleResponse.usedVehicles!.usedVehicleList![0].vin!,
-            miles);
+            miles,
+            folderName!);
       }
       VehicleItem vehicleItem = await _firestoreVehicleService.getVehicleData(
           vin.isNotEmpty
@@ -84,8 +89,8 @@ class BlackBookBloc extends Cubit<BlackBookState> {
     }
   }
 
-  Future<bool> _addVehicleToFirestore(
-      VehicleResponse vehicleResponse, String vin, String mileage) {
+  Future<bool> _addVehicleToFirestore(VehicleResponse vehicleResponse,
+      String vin, String mileage, String folderName) {
     UsedVehicleListItem usedVehicleListItem =
         vehicleResponse.usedVehicles!.usedVehicleList![0];
 
@@ -107,7 +112,7 @@ class BlackBookBloc extends Cubit<BlackBookState> {
         subName: subName,
         vin: vin,
         miles: mileage,
-        folder: 'Add to folder');
+        folder: folderName);
 
     return _firestoreVehicleService.addVehicle(vehicleItem: vehicleItem);
   }

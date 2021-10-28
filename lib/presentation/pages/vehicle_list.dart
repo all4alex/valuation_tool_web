@@ -35,7 +35,7 @@ class VehicleList extends StatefulWidget {
       })
       : super(key: key);
   final Function onItemSelect;
-  final Function onAddButtonClicked;
+  final Function(String) onAddButtonClicked;
   final String folder;
   final Function onFolderDeleted;
   @override
@@ -118,7 +118,7 @@ class _VehicleListState extends State<VehicleList> {
                                 fit: BoxFit.fitHeight)),
                         TextButton(
                             onPressed: () {
-                              widget.onAddButtonClicked();
+                              widget.onAddButtonClicked(args.folder!);
                             },
                             child: Text('Add Vehicle',
                                 textAlign: TextAlign.center)),

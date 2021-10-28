@@ -5,6 +5,8 @@ import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_state
 import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_details/vehicle_details.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_vehicle_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/select_folder_dialog_body.dart';
 
 class VehicleDetailsActions extends StatefulWidget {
@@ -88,14 +90,7 @@ class _VehicleDetailsActionsState extends State<VehicleDetailsActions> {
                     ])),
                 VerticalDivider(),
                 InkWell(
-                    onTap: () {
-                      // showDialog(
-                      //     context: context,
-                      //     builder: (BuildContext context) {
-                      //       return SelectFolderDialogBody(
-                      //           vehicleItem: widget.vehicleItem);
-                      //     });
-                    },
+                    onTap: () {},
                     child: Row(children: [
                       SizedBox(
                           height: 15,

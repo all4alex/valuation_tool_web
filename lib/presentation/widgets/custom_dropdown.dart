@@ -32,7 +32,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
       decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: const BorderRadius.all(
-            Radius.circular(10),
+            Radius.circular(5),
           )),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -46,7 +46,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
               value: value,
               child: Text(
                 value!,
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
             );
           }).toList(),
@@ -54,7 +54,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             child: Text(
               widget.hint,
               style: TextStyle(
-                  color: Colors.black,
+                  color: Color(0xff898989),
                   fontSize: 14,
                   fontWeight: FontWeight.w500),
             ),

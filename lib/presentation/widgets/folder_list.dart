@@ -3,6 +3,7 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_state.dart';
@@ -24,9 +25,11 @@ class _FolderListState extends State<FolderList> {
       ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
   final ScrollController _scrollController = ScrollController();
   TextEditingController folderTextController = TextEditingController();
-
+  late FToast fToast;
   @override
   void initState() {
+    fToast = FToast();
+    fToast.init(context);
     folderBloc = BlocProvider.of<FolderBloc>(context);
 
     if (window.location.href.contains('/main/vehicles')) {
@@ -34,6 +37,32 @@ class _FolderListState extends State<FolderList> {
     }
 
     super.initState();
+  }
+
+  void showErrorToast(String message) {
+    Widget toastBody = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.red,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.error, color: Colors.white),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(message, style: TextStyle(color: Colors.white)),
+        ],
+      ),
+    );
+    fToast.removeCustomToast();
+    fToast.showToast(
+      child: toastBody,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 
   @override
@@ -124,118 +153,145 @@ class _FolderListState extends State<FolderList> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Container(
-                width: 570,
-                height: 300,
+                width: 450,
+                height: 270,
                 alignment: Alignment.center,
                 child: Material(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                          height: 70,
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          color: Colors.blue,
-                          child: Text('Add Folder',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white))),
-                      Column(
-                        children: <Widget>[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 20, horizontal: 30),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text('Folder name',
-                                    textAlign: TextAlign.start,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 10),
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10),
-                                      )),
-                                  child: TextFormField(
-                                    controller: folderTextController,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    style: const TextStyle(
-                                        color: Colors.black, fontSize: 20),
-                                    onChanged: (String text) {
-                                      // onChanged!(text);
-                                    },
-                                    onEditingComplete: () {
-                                      // onEditingComplete;
-                                    },
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.all(15),
-                                        hintText:
-                                            'Please enter a folder name here',
-                                        hintStyle: TextStyle(fontSize: 15)),
-                                  ),
-                                ),
-                                const SizedBox(height: 30),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.red),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Container(
-                                        width: 220,
-                                        height: 60,
-                                        alignment: Alignment.center,
-                                        child: const Text('Cancel',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blue),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        folderBloc.addFolder(
-                                            folderItem: FolderItem(
-                                                folderName:
-                                                    folderTextController.text,
-                                                user: 'alex.ayso@valuation.com',
-                                                folderCount: 0));
-                                        folderTextController.clear();
-                                      },
-                                      child: Container(
-                                        width: 220,
-                                        height: 60,
-                                        alignment: Alignment.center,
-                                        child: const Text('Add Vehicle',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                    ),
-                                  ],
-                                )
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                            height: 70,
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(15),
+                            decoration: const BoxDecoration(
+                              color: Color(0xffF3F3F3),
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                    color: Colors.grey,
+                                    offset: Offset(0.0, 1.0),
+                                    blurRadius: 6.0,
+                                    spreadRadius: 0),
                               ],
                             ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Add Folder',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 18,
+                                        color: Color(0xff191919),
+                                        fontWeight: FontWeight.bold)),
+                                Text('Create a folder of your vehicle list',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 12, color: Color(0xff191919)))
+                              ],
+                            )),
+                        const SizedBox(height: 30),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text('Folder Name',
+                                  textAlign: TextAlign.start,
+                                  style: GoogleFonts.roboto(fontSize: 14)),
+                              const SizedBox(height: 5),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(5),
+                                    )),
+                                child: TextFormField(
+                                  controller: folderTextController,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 16),
+                                  onChanged: (String text) {
+                                    // onChanged!(text);
+                                  },
+                                  onEditingComplete: () {
+                                    // onEditingComplete;
+                                  },
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.all(15),
+                                      hintText: 'Enter Folder Name',
+                                      hintStyle: TextStyle(fontSize: 14)),
+                                ),
+                              ),
+                              const SizedBox(height: 30),
+                            ],
                           ),
-                        ],
-                      )
-                    ],
+                        ),
+                        Container(
+                            height: 70,
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(15),
+                            alignment: Alignment.bottomCenter,
+                            decoration: const BoxDecoration(
+                              color: Color(0xffF3F3F3),
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                    color: Colors.grey,
+                                    offset: Offset(0.0, 1.0),
+                                    blurRadius: 6.0,
+                                    spreadRadius: 0),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.close, color: Colors.red),
+                                        Text('  CANCEL',
+                                            style:
+                                                TextStyle(color: Colors.red)),
+                                      ],
+                                    )),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xff494949),
+                                  ),
+                                  onPressed: () {
+                                    if (folderTextController.text.isNotEmpty) {
+                                      Navigator.of(context).pop();
+                                      folderBloc.addFolder(
+                                          folderItem: FolderItem(
+                                              folderName:
+                                                  folderTextController.text,
+                                              user: 'alex.ayso@valuation.com',
+                                              folderCount: 0));
+                                      folderTextController.clear();
+                                    } else {
+                                      showErrorToast(
+                                          'Folder Name cannot be empty');
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 220,
+                                    height: 60,
+                                    alignment: Alignment.center,
+                                    child: const Text('Add Folder',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ],
+                            )),
+                      ],
+                    ),
                   ),
                 ),
               ),

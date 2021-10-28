@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ElevatedButton(
                               style: style,
                               onPressed: () {
-                                _showDialogModal(context);
+                                _showAddVehicleModal(context);
                               },
                               child: SizedBox(
                                 width: 170,
@@ -256,8 +256,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 uvc: null,
                                 isNew: false));
                       },
-                      onAddButtonClicked: () {
-                        _showDialogModal(context);
+                      onAddButtonClicked: (String folderName) {
+                        _showAddVehicleWithDefaultFolderModal(
+                            context, folderName);
                       },
                       folder: folderFilter,
                       onFolderDeleted: () {
@@ -273,8 +274,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 uvc: null,
                                 isNew: false));
                       },
-                      onAddButtonClicked: () {
-                        _showDialogModal(context);
+                      onAddButtonClicked: (String folderName) {
+                        _showAddVehicleWithDefaultFolderModal(
+                            context, folderName);
                       },
                       folder: folderFilter,
                       onFolderDeleted: () {
@@ -302,7 +304,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showDialogModal(BuildContext context) async {
+  void _showAddVehicleModal(BuildContext context) async {
+    showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 0),
+      context: context,
+      pageBuilder: (BuildContext context, anim1, anim2) {
+        return Align(
+            alignment: Alignment.center,
+            child: AddVehicleModalBody(onDataFound: (String vin, String mileage,
+                String categoryUVC, String selectedFolderName) {
+              Navigator.pushNamed(context, '/main/details',
+                  arguments: VehicleDetailsArgs(
+                      mileage: mileage,
+                      vin: vin,
+                      uvc: categoryUVC,
+                      isNew: true,
+                      folderName: selectedFolderName));
+            }));
+      },
+      transitionBuilder:
+          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
+        return SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+                  .animate(anim1),
+          child: child,
+        );
+      },
+    );
+  }
+
+  void _showAddVehicleWithDefaultFolderModal(
+      BuildContext context, String folderName) async {
     showGeneralDialog(
       barrierDismissible: true,
       barrierLabel: '',
@@ -312,14 +347,17 @@ class _HomeScreenState extends State<HomeScreen> {
         return Align(
             alignment: Alignment.center,
             child: AddVehicleModalBody(
-              onDataFound: (String vin, String mileage, String categoryUVC) {
+              onDataFound: (String vin, String mileage, String categoryUVC,
+                  String selectedFolderName) {
                 Navigator.pushNamed(context, '/main/details',
                     arguments: VehicleDetailsArgs(
                         mileage: mileage,
                         vin: vin,
                         uvc: categoryUVC,
-                        isNew: true));
+                        isNew: true,
+                        folderName: selectedFolderName));
               },
+              folderName: folderName,
             ));
       },
       transitionBuilder:
