@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_notes_modal_body.dart';
 
 class VehicleNotes extends StatelessWidget {
-  VehicleNotes({required this.email});
+  VehicleNotes({required this.email, required this.name});
   final String email;
+  final String name;
+
+  void _showAddNotesModal(BuildContext context) async {
+    showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 0),
+      context: context,
+      pageBuilder: (BuildContext context, anim1, anim2) {
+        return Align(
+          alignment: Alignment.center,
+          child: AddNotesModalBody(
+            name: name,
+          ),
+        );
+      },
+      transitionBuilder:
+          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
+        return SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+                  .animate(anim1),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -35,7 +64,7 @@ class VehicleNotes extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () => _showAddNotesModal(context),
                     child: Row(children: [
                       SizedBox(
                           height: 15,
