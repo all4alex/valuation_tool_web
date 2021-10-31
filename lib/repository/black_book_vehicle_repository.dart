@@ -26,6 +26,22 @@ abstract class BlackBookRepository {
     required String zipcode,
   });
 
+  Future<RetailStatisticsResponse> searchRetailListingByVIN({
+    required String vin,
+    required String mileage,
+    required String zipcode,
+    required String listingPerPage,
+    required String listingType,
+  });
+
+  Future<RetailStatisticsResponse> searchRetailListingsByUVC({
+    required String uvc,
+    required String mileage,
+    required String zipcode,
+    required String listingPerPage,
+    required String listingType,
+  });
+
   Future<MakeByYearResponse> findModelsByYear({
     required String year,
   });
@@ -75,5 +91,35 @@ class BlackBookRepositoryImpl implements BlackBookRepository {
       {required String vin, required String mileage, required String zipcode}) {
     return _apiService.searchRetailStatsByVIN(
         vin: vin, maximumMileage: mileage, zipcode: zipcode);
+  }
+
+  @override
+  Future<RetailStatisticsResponse> searchRetailListingByVIN(
+      {required String vin,
+      required String mileage,
+      required String zipcode,
+      required String listingPerPage,
+      required String listingType}) {
+    return _apiService.searchRetailListingByVIN(
+        vin: vin,
+        maximumMileage: mileage,
+        zipcode: zipcode,
+        listingPerPage: listingPerPage,
+        listingType: listingType);
+  }
+
+  @override
+  Future<RetailStatisticsResponse> searchRetailListingsByUVC(
+      {required String uvc,
+      required String mileage,
+      required String zipcode,
+      required String listingPerPage,
+      required String listingType}) {
+    return _apiService.searchRetailListingByUVC(
+        uvc: uvc,
+        maximumMileage: mileage,
+        zipcode: zipcode,
+        listingPerPage: listingPerPage,
+        listingType: listingType);
   }
 }

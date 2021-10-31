@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:valuation_tool_web/models/retail_statistics_response.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
+import 'package:valuation_tool_web/presentation/widgets/retail_listing/retail_listing.dart';
 
 class RetailAndProfit extends StatelessWidget {
-  RetailAndProfit({required this.usedVehicleListItem});
+  RetailAndProfit({
+    required this.usedVehicleListItem,
+    required this.vehicleName,
+    required this.retailStatisticsResponse,
+  });
   final UsedVehicleListItem usedVehicleListItem;
+  final String vehicleName;
+  final RetailStatisticsResponse retailStatisticsResponse;
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -23,7 +33,9 @@ class RetailAndProfit extends StatelessWidget {
         ),
         child: Row(
           children: [
-            RetailButton(),
+            RetailButton(
+                vehicleName: vehicleName,
+                retailStatisticsResponse: retailStatisticsResponse),
             const SizedBox(
               width: 15,
             ),
@@ -72,10 +84,63 @@ class ProfitCalculatorButton extends StatelessWidget {
   }
 }
 
-class RetailButton extends StatelessWidget {
+class RetailButton extends StatefulWidget {
   const RetailButton({
+    required this.retailStatisticsResponse,
+    required this.vehicleName,
     Key? key,
   }) : super(key: key);
+  final RetailStatisticsResponse retailStatisticsResponse;
+
+  final String vehicleName;
+
+  @override
+  State<RetailButton> createState() => _RetailButtonState();
+}
+
+class _RetailButtonState extends State<RetailButton> {
+  void _showAddNotesModal(BuildContext context) async {
+    showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 0),
+      context: context,
+      pageBuilder: (BuildContext context, anim1, anim2) {
+        return Align(
+            alignment: Alignment.center,
+            child: RetailListing(
+              activeRetailList: activeRetailList,
+              soldRetailList: soldRetailList,
+              vehicleName: widget.vehicleName,
+              retailStatisticsResponse: widget.retailStatisticsResponse,
+            ));
+      },
+      transitionBuilder:
+          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
+        return SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+                  .animate(anim1),
+          child: child,
+        );
+      },
+    );
+  }
+
+  List<RetailItemResponse> soldRetailList = <RetailItemResponse>[];
+  List<RetailItemResponse> activeRetailList = <RetailItemResponse>[];
+  @override
+  void initState() {
+    for (RetailItemResponse item in widget.retailStatisticsResponse.listings!) {
+      if (item.listingType == 'Active') {
+        activeRetailList.add(item);
+      } else {
+        soldRetailList.add(item);
+      }
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,13 +164,17 @@ class RetailButton extends StatelessWidget {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               textStyle: const TextStyle(fontSize: 20)),
-          onPressed: () {},
+          onPressed: () {
+            _showAddNotesModal(context);
+          },
           child: Container(
-              width: MediaQuery.of(context).size.width * .15,
-              height: 40,
-              alignment: Alignment.center,
-              child: const Text('(20) RETAIL MARKET',
-                  style: TextStyle(fontSize: 12))),
+            width: MediaQuery.of(context).size.width * .15,
+            height: 40,
+            alignment: Alignment.center,
+            child: Text(
+                '(${activeRetailList.length + soldRetailList.length}) RETAIL MARKET',
+                style: TextStyle(fontSize: 12)),
+          ),
         )
       ],
     );

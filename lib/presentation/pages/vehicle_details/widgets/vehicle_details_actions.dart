@@ -29,7 +29,7 @@ class _VehicleDetailsActionsState extends State<VehicleDetailsActions> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 10),
-      height: 110,
+      height: 85,
       child: Column(
         children: [
           Container(

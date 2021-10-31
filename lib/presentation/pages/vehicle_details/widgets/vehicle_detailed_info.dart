@@ -115,10 +115,6 @@ class Info extends StatelessWidget {
               width: 150,
               child: InfoItemWithSpacing(
                   name: 'Run Number:', info: 'Empty', isClickable: true)),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
-                  name: 'Mileage:', info: '$mileage', isClickable: true)),
         ]),
         SizedBox(width: 70),
         Column(children: [
@@ -134,10 +130,7 @@ class Info extends StatelessWidget {
               width: 150,
               child: InfoItemWithSpacing(
                   name: 'Auction:', info: 'Demo', isClickable: true)),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
-                  name: 'Region:', info: 'Utah', isClickable: true)),
+                  
         ]),
       ],
     );

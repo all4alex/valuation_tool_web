@@ -36,6 +36,7 @@ import 'widgets/blackbook_values.dart';
 import 'widgets/vehicle_basic_info.dart';
 import 'widgets/vehicle_detailed_info.dart';
 import 'widgets/vehicle_details_actions.dart';
+import 'widgets/vehicle_details_tag.dart';
 import 'widgets/vehicle_highlights_overview.dart';
 import 'widgets/vehicle_price_overview.dart';
 
@@ -74,9 +75,11 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     uploadImageBloc = BlocProvider.of<UploadImageBloc>(context);
     blackBookBloc.reInit();
     Future.delayed(Duration.zero, () {
-      args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
-      // args = VehicleDetailsArgs(
-      //     vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
+      // args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
+
+      //uncomment bellow line if working/testing on vehicle details page
+      args = VehicleDetailsArgs(
+          vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
 
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc.getVehiclDataByVin(
@@ -193,9 +196,17 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                         folderName: folderName,
                         vehicleItem: vehicleItem,
                       ),
-                      const SizedBox(height: 15),
+                      VehicleDetailsTag(
+                        regions: 'Utah',
+                        mileage: state.vehicleItem.miles!,
+                        condition: 'Average',
+                      ),
+                      const SizedBox(height: 18),
                       RetailAndProfit(
                         usedVehicleListItem: usedVehicleListItem,
+                        retailStatisticsResponse:
+                            state.retailStatisticsResponse,
+                        vehicleName: '$year $make $model',
                       ),
                       BlackBookValues(
                         title: '$year $make $model',

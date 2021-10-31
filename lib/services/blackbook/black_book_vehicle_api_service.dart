@@ -34,6 +34,24 @@ abstract class BlackBookVehicleApiService {
     @Query('zipcode') required String zipcode,
   });
 
+  @GET('/RetailAPI/RetailAPI/Listings')
+  Future<RetailStatisticsResponse> searchRetailListingByVIN({
+    @Query('vin') required String vin,
+    @Query('maximum_mileage') required String maximumMileage,
+    @Query('zipcode') required String zipcode,
+    @Query('listings_per_page') required String listingPerPage,
+    @Query('listing_type') required String listingType,
+  });
+
+  @GET('RetailAPI/RetailAPI/Listings')
+  Future<RetailStatisticsResponse> searchRetailListingByUVC({
+    @Query('uvc') required String uvc,
+    @Query('maximum_mileage') required String maximumMileage,
+    @Query('zipcode') required String zipcode,
+    @Query('listings_per_page') required String listingPerPage,
+    @Query('listing_type') required String listingType,
+  });
+
   @GET('UsedCarWS/UsedCarWS/Drilldown/ALL/{year}')
   Future<MakeByYearResponse> findModelsByYear({
     @Path() required String year,

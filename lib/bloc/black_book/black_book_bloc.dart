@@ -43,12 +43,22 @@ class BlackBookBloc extends Cubit<BlackBookState> {
 
       if (vin!.isNotEmpty) {
         vehicleResponse = await blackBookRepository.getVehicleByVin(vin: vin);
-        retailStatisticsResponse = await blackBookRepository
-            .searchRetailStatsByVIN(vin: vin, mileage: miles, zipcode: '84101');
+        retailStatisticsResponse =
+            await blackBookRepository.searchRetailListingByVIN(
+                vin: vin,
+                mileage: miles,
+                zipcode: '84101',
+                listingPerPage: '200',
+                listingType: 'both');
       } else {
         vehicleResponse = await blackBookRepository.getVehicleByUvc(uvc: uvc!);
-        retailStatisticsResponse = await blackBookRepository
-            .searchRetailStatsByUVC(uvc: uvc, mileage: miles, zipcode: '84101');
+        retailStatisticsResponse =
+            await blackBookRepository.searchRetailListingsByUVC(
+                uvc: uvc,
+                mileage: miles,
+                zipcode: '84101',
+                listingPerPage: '200',
+                listingType: 'both');
       }
       List<VehicleHighlightsVM> highlightsList =
           _getVehicleHighlights(retailStatisticsResponse, vehicleResponse);
@@ -79,7 +89,8 @@ class BlackBookBloc extends Cubit<BlackBookState> {
           vehicleResponse: vehicleResponse,
           vehicleName: vehicleName,
           vehicleItem: vehicleItem,
-          highlightsList: highlightsList));
+          highlightsList: highlightsList,
+          retailStatisticsResponse: retailStatisticsResponse));
     } on DioError catch (e) {
       print(e.error);
       emit(BlackBookFailedState(error: e.response!.data));
