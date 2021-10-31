@@ -75,11 +75,11 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     uploadImageBloc = BlocProvider.of<UploadImageBloc>(context);
     blackBookBloc.reInit();
     Future.delayed(Duration.zero, () {
-      // args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
+      args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
 
       //uncomment bellow line if working/testing on vehicle details page
-      args = VehicleDetailsArgs(
-          vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
+      // args = VehicleDetailsArgs(
+      //     vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
 
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc.getVehiclDataByVin(
