@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
+import 'package:valuation_tool_web/bloc/notes/notes_state.dart';
+import 'package:valuation_tool_web/models/firestore/note_item_model.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_notes_modal_body.dart';
 
-class VehicleNotes extends StatelessWidget {
-  VehicleNotes({required this.email, required this.name});
+class VehicleNotes extends StatefulWidget {
+  VehicleNotes({required this.email, required this.name, required this.vin});
   final String email;
   final String name;
+  final String vin;
 
+  @override
+  State<VehicleNotes> createState() => _VehicleNotesState();
+}
+
+class _VehicleNotesState extends State<VehicleNotes> {
   void _showAddNotesModal(BuildContext context) async {
     showGeneralDialog(
       barrierDismissible: true,
@@ -16,7 +26,9 @@ class VehicleNotes extends StatelessWidget {
         return Align(
           alignment: Alignment.center,
           child: AddNotesModalBody(
-            name: name,
+            name: widget.name,
+            user: widget.email,
+            vin: widget.vin,
           ),
         );
       },
@@ -30,6 +42,16 @@ class VehicleNotes extends StatelessWidget {
         );
       },
     );
+  }
+
+  late NotesBloc notesBloc;
+  List<NoteItemModel> list = <NoteItemModel>[];
+
+  @override
+  void initState() {
+    notesBloc = BlocProvider.of<NotesBloc>(context);
+    notesBloc.getAllNotes(vin: widget.vin);
+    super.initState();
   }
 
   @override
@@ -78,18 +100,30 @@ class VehicleNotes extends StatelessWidget {
               ),
               Divider(),
               SizedBox(height: 5),
-              Container(
-                height: screenSize.height * .25,
-                child: ListView.separated(
-                  itemCount: 2,
-                  itemBuilder: (BuildContext context, int i) {
-                    return NoteItem(screenSize: screenSize, email: email);
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Divider(height: 30);
-                  },
-                ),
-              ),
+              BlocBuilder<NotesBloc, NotesState>(
+                  builder: (BuildContext context, NotesState state) {
+                if (state is GetNotesLoadingState) {
+                  return Center(child: const CircularProgressIndicator());
+                } else if (state is GetNotesSuccessState) {
+                  list = state.list;
+                }
+                if (state is GetNotesFailedState) {
+                  return Center(child: const CircularProgressIndicator());
+                }
+                return Container(
+                  height: screenSize.height * .25,
+                  child: ListView.separated(
+                    itemCount: list.length,
+                    itemBuilder: (BuildContext context, int i) {
+                      return NoteItem(
+                          notes: list[i].note!, email: list[i].user!);
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(height: 30);
+                    },
+                  ),
+                );
+              }),
               Divider(),
               InkWell(
                 onTap: () {},
@@ -110,17 +144,16 @@ class VehicleNotes extends StatelessWidget {
 }
 
 class NoteItem extends StatelessWidget {
-  const NoteItem({
-    Key? key,
-    required this.screenSize,
-    required this.email,
-  }) : super(key: key);
+  const NoteItem({Key? key, required this.email, required this.notes})
+      : super(key: key);
 
-  final Size screenSize;
   final String email;
+  final String notes;
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+
     return Container(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -133,7 +166,7 @@ class NoteItem extends StatelessWidget {
             SizedBox(
               width: screenSize.width * .28,
               child: SelectableText(
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                notes,
                 style: TextStyle(overflow: TextOverflow.clip, fontSize: 12),
               ),
             ),

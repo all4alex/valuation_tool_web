@@ -130,7 +130,6 @@ class Info extends StatelessWidget {
               width: 150,
               child: InfoItemWithSpacing(
                   name: 'Auction:', info: 'Demo', isClickable: true)),
-                  
         ]),
       ],
     );

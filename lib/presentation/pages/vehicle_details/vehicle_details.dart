@@ -181,11 +181,12 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                           mileage: state.vehicleItem.miles!),
                       const SizedBox(height: 15),
                       VehicleNotes(
-                          email: 'alex.ayso04@gmail.com',
-                          name: '$year $make $model'),
+                          email: 'alex.ayso@valuation.com',
+                          name: '$year $make $model',
+                          vin: state.vehicleItem.vin!),
                       const SizedBox(height: 15),
                       VehicleActivity(
-                        email: 'alex.ayso04@gmail.com',
+                        email: 'alex.ayso@valuation.com',
                       ),
                     ],
                   ),

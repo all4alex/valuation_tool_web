@@ -1,21 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
+import 'package:valuation_tool_web/models/firestore/note_item_model.dart';
 
 class AddNotesModalBody extends StatefulWidget {
+  const AddNotesModalBody(
+      {Key? key, required this.name, required this.vin, required this.user})
+      : super(key: key);
   final String name;
+  final String vin;
+  final String user;
 
-  const AddNotesModalBody({Key? key, required this.name}) : super(key: key);
   @override
   State<AddNotesModalBody> createState() => _AddNotesModalBodyState();
 }
 
 class _AddNotesModalBodyState extends State<AddNotesModalBody> {
-  TextEditingController nameTextEditingController = TextEditingController();
+  late TextEditingController nameTextEditingController;
   TextEditingController noteTextEditingController = TextEditingController();
+  late NotesBloc notesBloc;
+  late FToast fToast;
 
   @override
   void initState() {
+    notesBloc = BlocProvider.of<NotesBloc>(context);
+    nameTextEditingController = TextEditingController(text: widget.user);
+    fToast = FToast();
+    fToast.init(context);
     super.initState();
+  }
+
+  void showErrorToast(String message) {
+    Widget toastBody = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.red,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.error, color: Colors.white),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(message, style: TextStyle(color: Colors.white)),
+        ],
+      ),
+    );
+    fToast.removeCustomToast();
+    fToast.showToast(
+      child: toastBody,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 
   @override
@@ -82,6 +122,7 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
                         Container(
                           child: TextFormField(
                             textCapitalization: TextCapitalization.sentences,
+                            enabled: false,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey),
@@ -174,7 +215,20 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
                             style: ElevatedButton.styleFrom(
                               primary: Color(0xff17A0FB),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              String note = noteTextEditingController.text;
+                              if (note.isNotEmpty) {
+                                Navigator.of(context).pop();
+                                NoteItemModel noteItemModel = NoteItemModel(
+                                    user: widget.user,
+                                    vin: widget.vin,
+                                    note: note);
+                                notesBloc.addNotes(
+                                    noteItemModel: noteItemModel);
+                              } else {
+                                showErrorToast('Note must not be empty!');
+                              }
+                            },
                             child: Container(
                               alignment: Alignment.center,
                               child: Row(

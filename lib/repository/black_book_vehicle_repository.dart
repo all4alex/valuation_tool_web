@@ -14,18 +14,6 @@ abstract class BlackBookRepository {
     required String uvc,
   });
 
-  Future<RetailStatisticsResponse> searchRetailStatsByVIN({
-    required String vin,
-    required String mileage,
-    required String zipcode,
-  });
-
-  Future<RetailStatisticsResponse> searchRetailStatsByUVC({
-    required String uvc,
-    required String mileage,
-    required String zipcode,
-  });
-
   Future<RetailStatisticsResponse> searchRetailListingByVIN({
     required String vin,
     required String mileage,
@@ -77,20 +65,6 @@ class BlackBookRepositoryImpl implements BlackBookRepository {
   @override
   Future<VehicleResponse> getVehicleByUvc({required String uvc}) {
     return _apiService.searchVehicleByUVC(uvc: uvc);
-  }
-
-  @override
-  Future<RetailStatisticsResponse> searchRetailStatsByUVC(
-      {required String uvc, required String mileage, required String zipcode}) {
-    return _apiService.searchRetailStatsByUVC(
-        uvc: uvc, maximumMileage: mileage, zipcode: zipcode);
-  }
-
-  @override
-  Future<RetailStatisticsResponse> searchRetailStatsByVIN(
-      {required String vin, required String mileage, required String zipcode}) {
-    return _apiService.searchRetailStatsByVIN(
-        vin: vin, maximumMileage: mileage, zipcode: zipcode);
   }
 
   @override
