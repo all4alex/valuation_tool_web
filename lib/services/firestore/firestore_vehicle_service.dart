@@ -72,7 +72,8 @@ class FirestoreVehicleService {
     return isSuccess;
   }
 
-  Future<VehicleItem> getVehicleData(String vin, String email) async {
+  Future<VehicleItem> getVehicleData(
+      {required String vin, required String email}) async {
     VehicleItem vehicleItem = await _collectionReference
         .where('user', isEqualTo: email)
         .where('vin', isEqualTo: vin)

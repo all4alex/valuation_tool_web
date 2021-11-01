@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
+import 'package:valuation_tool_web/models/blackbook/state_response.dart';
 import 'package:valuation_tool_web/models/blackbook/make_by_year_response.dart';
 import 'package:valuation_tool_web/models/blackbook/vehicle_by_make_response.dart';
 import 'package:valuation_tool_web/models/retail_statistics_response.dart';
@@ -48,4 +49,7 @@ abstract class BlackBookVehicleApiService {
     @Path() required String year,
     @Path() required String make,
   });
+
+  @GET('UsedCarWS/UsedCarWS/State')
+  Future<StateResponse> getStates();
 }

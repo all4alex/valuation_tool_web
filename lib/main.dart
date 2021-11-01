@@ -6,7 +6,9 @@ import 'package:valuation_tool_web/bloc/category_search/category_search_bloc.dar
 import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
+import 'package:valuation_tool_web/bloc/states/states_bloc.dart';
 import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
+import 'package:valuation_tool_web/bloc/vehicle_info/vehicle_info_bloc.dart';
 import 'package:valuation_tool_web/repository/black_book_vehicle_repository.dart';
 import 'app/app.dart';
 import 'bloc/black_book/black_book_bloc.dart';
@@ -41,5 +43,8 @@ Future<void> main() async {
     BlocProvider<UploadImageBloc>(
         create: (BuildContext context) => UploadImageBloc()),
     BlocProvider<NotesBloc>(create: (BuildContext context) => NotesBloc()),
+    BlocProvider<VehicleInfoBloc>(
+        create: (BuildContext context) => VehicleInfoBloc()),
+    BlocProvider<StatesBloc>(create: (BuildContext context) => StatesBloc()),
   ], child: const App()));
 }

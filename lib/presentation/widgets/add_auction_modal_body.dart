@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:valuation_tool_web/bloc/vehicle_info/vehicle_info_bloc.dart';
+import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/presentation/widgets/modal/modal_footer.dart';
 import 'package:valuation_tool_web/presentation/widgets/modal/modal_header.dart';
 
 class AddAuctionModalBody extends StatefulWidget {
-  const AddAuctionModalBody({Key? key}) : super(key: key);
+  const AddAuctionModalBody({Key? key, required this.vehicleItem})
+      : super(key: key);
+  final VehicleItem vehicleItem;
+
   @override
   State<AddAuctionModalBody> createState() => _AddAuctionModalBodyState();
 }
 
 class _AddAuctionModalBodyState extends State<AddAuctionModalBody> {
-  TextEditingController auctionTextEditingController = TextEditingController();
+  late TextEditingController auctionTextEditingController;
   final _formKey = GlobalKey<FormState>();
+  late VehicleInfoBloc vehicleInfoBloc;
   @override
   void initState() {
+    vehicleInfoBloc = BlocProvider.of<VehicleInfoBloc>(context);
+    auctionTextEditingController =
+        TextEditingController(text: widget.vehicleItem.auction);
     super.initState();
   }
 
   void _onSave() {
     print('SAVE...');
     if (_formKey.currentState!.validate()) {
-      // api call...
+      Navigator.of(context).pop();
+      vehicleInfoBloc.updateAuction(
+          vehicleItem: widget.vehicleItem
+              .copyWith(auction: auctionTextEditingController.text));
     }
   }
 

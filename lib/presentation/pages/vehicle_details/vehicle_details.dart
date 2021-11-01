@@ -78,11 +78,11 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     uploadImageBloc = BlocProvider.of<UploadImageBloc>(context);
     blackBookBloc.reInit();
     Future.delayed(Duration.zero, () {
-      args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
+      // args = ModalRoute.of(context)!.settings.arguments as VehicleDetailsArgs;
 
       //uncomment bellow line if working/testing on vehicle details page
-      // args = VehicleDetailsArgs(
-      //     vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
+      args = VehicleDetailsArgs(
+          vin: 'JM1GL1VM5M1607776', uvc: null, mileage: null, isNew: false);
 
       print('THE MILEAGE: ${args.mileage}');
       blackBookBloc.getVehiclDataByVin(
@@ -181,7 +181,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                       const SizedBox(height: 15),
                       VehicleDetailedInfo(
                           usedVehicleListItem: usedVehicleListItem,
-                          mileage: state.vehicleItem.miles!),
+                          vehicleItem: state.vehicleItem),
                       const SizedBox(height: 15),
                       VehicleNotes(
                           email: 'alex.ayso@valuation.com',
@@ -205,45 +205,12 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                       //   mileage: state.vehicleItem.miles!,
                       //   condition: 'Average',
                       // ),
-                      Container(
-                        width: screenSize.width * .38,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              child: InfoItemWithSpacing(
-                                name: 'Mileage:',
-                                info: '35679',
-                                isClickable: true,
-                                space: 5,
-                                infoDecoration: TextDecoration.none,
-                                modalWidget: AddMileageModalBody(),
-                              ),
-                            ),
-                            Container(
-                              child: InfoItemWithSpacing(
-                                name: 'Region:',
-                                info: 'Utah',
-                                isClickable: true,
-                                space: 5,
-                                infoDecoration: TextDecoration.none,
-                                modalWidget: AddRegionModalBody(),
-                              ),
-                            ),
-                            Container(
-                              child: InfoItemWithSpacing(
-                                  name: 'Condition:',
-                                  info: 'Average',
-                                  space: 5,
-                                  infoDecoration: TextDecoration.none,
-                                  modalWidget: AddConditionModalBody(),
-                                  isClickable: true,
-                                  infoColor: Colors.orange),
-                            ),
-                          ],
-                        ),
+                      VehicleDetailsTag(
+                        region: 'Utah',
+                        vehicleItem: vehicleItem,
                       ),
-                      const SizedBox(height: 15),
+
+                      const SizedBox(height: 10),
                       RetailAndProfit(
                         usedVehicleListItem: usedVehicleListItem,
                         retailStatisticsResponse:

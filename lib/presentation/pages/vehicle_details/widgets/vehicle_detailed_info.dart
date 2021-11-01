@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:valuation_tool_web/bloc/vehicle_info/vehicle_info_bloc.dart';
+import 'package:valuation_tool_web/bloc/vehicle_info/vehicle_info_state.dart';
+import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_auction_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_run_number_modal_body.dart';
@@ -6,9 +10,9 @@ import 'package:valuation_tool_web/presentation/widgets/info_item_with_spacing.d
 
 class VehicleDetailedInfo extends StatelessWidget {
   VehicleDetailedInfo(
-      {required this.usedVehicleListItem, required this.mileage});
+      {required this.usedVehicleListItem, required this.vehicleItem});
   final UsedVehicleListItem usedVehicleListItem;
-  final String mileage;
+  final VehicleItem vehicleItem;
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -39,7 +43,9 @@ class VehicleDetailedInfo extends StatelessWidget {
               ),
               Divider(),
               SizedBox(height: 5),
-              Info(usedVehicleListItem: usedVehicleListItem, mileage: mileage),
+              Info(
+                  usedVehicleListItem: usedVehicleListItem,
+                  vehicleItem: vehicleItem),
               SizedBox(height: 30),
               CarfaxButton(),
               const SizedBox(height: 10),
@@ -90,65 +96,113 @@ class CarfaxButton extends StatelessWidget {
   }
 }
 
-class Info extends StatelessWidget {
-  const Info({
-    Key? key,
-    required this.usedVehicleListItem,
-    required this.mileage,
-  }) : super(key: key);
+class Info extends StatefulWidget {
+  Info({Key? key, required this.usedVehicleListItem, required this.vehicleItem})
+      : super(key: key);
 
   final UsedVehicleListItem usedVehicleListItem;
-  final String mileage;
+  final VehicleItem vehicleItem;
+
+  @override
+  State<Info> createState() => _InfoState();
+}
+
+class _InfoState extends State<Info> {
+  late VehicleItem vehicleItem;
+  late VehicleInfoBloc vehicleInfoBloc;
+
+  @override
+  void initState() {
+    vehicleInfoBloc = BlocProvider.of<VehicleInfoBloc>(context);
+    vehicleItem = widget.vehicleItem;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Column(children: [
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
-                  name: 'Style:', info: '${usedVehicleListItem.style}')),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
-                  name: 'Fuel Type:', info: '${usedVehicleListItem.fuelType}')),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
+        Expanded(
+          flex: 1,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            InfoItemWithSpacing(
+                name: 'Style:', info: '${widget.usedVehicleListItem.style}'),
+            InfoItemWithSpacing(
+                name: 'Fuel Type:',
+                info: '${widget.usedVehicleListItem.fuelType}'),
+            BlocBuilder<VehicleInfoBloc, VehicleInfoState>(
+                builder: (BuildContext context, VehicleInfoState state) {
+              if (state is UpdateRunNumberLoadingState) {
+                return InfoItemWithSpacing(
+                  name: 'Run Number:',
+                  infoWidget: SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator()),
+                  isClickable: true,
+                  modalWidget: AddRunNumberModalBody(
+                    vehicleItem: vehicleItem,
+                  ),
+                );
+              } else if (state is UpdateRunNumberSuccessState) {
+                vehicleItem = state.vehicleItem;
+              }
+              return InfoItemWithSpacing(
                 name: 'Run Number:',
-                info: 'Empty',
+                info: vehicleItem.runNumber ?? 'Add',
                 isClickable: true,
-                modalWidget: AddRunNumberModalBody(),
-              )),
-          // Container(
-          //     width: 150,
-          //     child: InfoItemWithSpacing(
-          //         name: 'Mileage:', info: '$mileage', isClickable: true)),
-        ]),
-        SizedBox(width: 70),
-        Column(children: [
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
-                  name: 'Drive Train:',
-                  info: '${usedVehicleListItem.drivetrain}')),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(name: 'Location:', info: 'Lehi, UT')),
-          Container(
-              width: 150,
-              child: InfoItemWithSpacing(
+                modalWidget: AddRunNumberModalBody(
+                  vehicleItem: vehicleItem,
+                ),
+              );
+            }),
+            // Container(
+            //     width: 150,
+            //     child: InfoItemWithSpacing(
+            //         name: 'Mileage:', info: '$mileage', isClickable: true)),
+          ]),
+        ),
+        Expanded(
+          flex: 1,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            InfoItemWithSpacing(
+                name: 'Drive Train:',
+                info: '${widget.usedVehicleListItem.drivetrain}'),
+            InfoItemWithSpacing(name: 'Location:', info: 'Lehi, UT'),
+            BlocBuilder<VehicleInfoBloc, VehicleInfoState>(
+                builder: (BuildContext context, VehicleInfoState state) {
+              if (state is UpdateAuctionLoadingState) {
+                return InfoItemWithSpacing(
+                  name: 'Auction:',
+                  infoWidget: SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator()),
+                  isClickable: true,
+                  modalWidget: AddAuctionModalBody(
+                    vehicleItem: vehicleItem,
+                  ),
+                );
+              } else if (state is UpdateAuctionSuccessState) {
+                vehicleItem = state.vehicleItem;
+              }
+              return InfoItemWithSpacing(
                 name: 'Auction:',
-                info: 'Demo',
+                info: vehicleItem.auction ?? 'Add',
                 isClickable: true,
-                modalWidget: AddAuctionModalBody(),
-              )),
-          // Container(
-          //     width: 150,
-          //     child: InfoItemWithSpacing(
-          //         name: 'Region:', info: 'Utah', isClickable: true)),
-        ]),
+                modalWidget: AddAuctionModalBody(
+                  vehicleItem: vehicleItem,
+                ),
+              );
+            }),
+            // Container(
+            //     width: 150,
+            //     child: InfoItemWithSpacing(
+            //         name: 'Region:', info: 'Utah', isClickable: true)),
+          ]),
+        ),
       ],
     );
   }

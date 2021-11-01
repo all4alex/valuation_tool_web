@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:valuation_tool_web/models/blackbook/state_response.dart';
 import 'package:valuation_tool_web/models/blackbook/make_by_year_response.dart';
 import 'package:valuation_tool_web/models/blackbook/vehicle_by_make_response.dart';
 import 'package:valuation_tool_web/models/retail_statistics_response.dart';
@@ -38,7 +39,11 @@ abstract class BlackBookRepository {
     required String year,
     required String make,
   });
+
+  Future<StateResponse> getStateList();
 }
+
+///IMPLEM
 
 class BlackBookRepositoryImpl implements BlackBookRepository {
   BlackBookRepositoryImpl();
@@ -95,5 +100,10 @@ class BlackBookRepositoryImpl implements BlackBookRepository {
         zipcode: zipcode,
         listingPerPage: listingPerPage,
         listingType: listingType);
+  }
+
+  @override
+  Future<StateResponse> getStateList() {
+    return _apiService.getStates();
   }
 }

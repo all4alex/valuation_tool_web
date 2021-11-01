@@ -7,13 +7,17 @@ class InfoItemWithSpacing extends StatelessWidget {
       this.info = 'info',
       this.isClickable = false,
       this.modalWidget,
+      this.infoWidget,
+      this.infoWidth,
       this.infoColor,
       this.infoDecoration,
-      this.space = 20.0});
+      this.space = 10.0});
   final String name;
   final String info;
   final bool isClickable;
   final Widget? modalWidget;
+  final Widget? infoWidget;
+  final double? infoWidth;
   final Color? infoColor;
   final TextDecoration? infoDecoration;
   final double? space;
@@ -48,31 +52,37 @@ class InfoItemWithSpacing extends StatelessWidget {
       padding: EdgeInsets.only(
         top: 8,
       ),
-      child: Row(children: [
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
           name,
           style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         ),
         SizedBox(width: space),
-        InkWell(
-          onTap: () =>
-              isClickable && modalWidget != null ? _showModal(context) : null,
-          child: Text(
-            info,
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            style: isClickable
-                ? TextStyle(
-                    fontSize: 13,
-                    color: infoColor != null ? infoColor : Colors.blue,
-                    decoration: infoDecoration != null
-                        ? infoDecoration
-                        : TextDecoration.underline)
-                : TextStyle(
-                    fontSize: 13,
-                    color: infoColor != null ? infoColor : Colors.black),
-          ),
-        ),
+        infoWidget ??
+            InkWell(
+              onTap: () => isClickable && modalWidget != null
+                  ? _showModal(context)
+                  : null,
+              child: SizedBox(
+                width: infoWidth ?? 100,
+                child: Text(
+                  info,
+                  overflow: TextOverflow.clip,
+                  maxLines: 3,
+                  textAlign: TextAlign.left,
+                  style: isClickable
+                      ? TextStyle(
+                          fontSize: 13,
+                          color: infoColor != null ? infoColor : Colors.blue,
+                          decoration: infoDecoration != null
+                              ? infoDecoration
+                              : TextDecoration.underline)
+                      : TextStyle(
+                          fontSize: 13,
+                          color: infoColor != null ? infoColor : Colors.black),
+                ),
+              ),
+            ),
       ]),
     );
   }

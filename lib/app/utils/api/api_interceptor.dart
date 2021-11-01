@@ -11,8 +11,6 @@ class ApiInterceptor extends Interceptor {
   void onResponse(
       Response<dynamic> response, ResponseInterceptorHandler handler) {
     logger.d('RESPONSE STATUSCODE: ${response.statusCode}');
-    logger.d('RESPONSE BODY: ${response.data}');
-
     return super.onResponse(response, handler);
   }
 

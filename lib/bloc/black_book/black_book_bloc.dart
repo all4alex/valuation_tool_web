@@ -37,7 +37,7 @@ class BlackBookBloc extends Cubit<BlackBookState> {
         miles = mileage!;
       } else {
         miles = await _firestoreVehicleService
-            .getVehicleData(vin!, 'alex.ayso@valuation.com')
+            .getVehicleData(vin: vin!, email: 'alex.ayso@valuation.com')
             .then((value) => value.miles!);
       }
 
@@ -80,10 +80,10 @@ class BlackBookBloc extends Cubit<BlackBookState> {
             folderName!);
       }
       VehicleItem vehicleItem = await _firestoreVehicleService.getVehicleData(
-          vin.isNotEmpty
+          vin: vin.isNotEmpty
               ? vin
               : vehicleResponse.usedVehicles!.usedVehicleList![0].vin!,
-          'alex.ayso@valuation.com');
+          email: 'alex.ayso@valuation.com');
 
       emit(BlackBookSuccessState(
           vehicleResponse: vehicleResponse,

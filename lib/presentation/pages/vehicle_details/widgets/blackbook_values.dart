@@ -18,7 +18,7 @@ class BlackBookValues extends StatelessWidget {
         padding: EdgeInsets.all(20),
         margin: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
         decoration: const BoxDecoration(
-          color: Color(0xffF3F3F3),
+          color: Color(0xffFFFFFF),
           borderRadius: BorderRadius.all(Radius.circular(5)),
           boxShadow: <BoxShadow>[
             BoxShadow(

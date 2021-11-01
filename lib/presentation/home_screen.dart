@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: const Color(0xffD9DBE1),
+      backgroundColor: const Color(0xfff5f7fd),
       body: Row(
         children: <Widget>[
           Stack(

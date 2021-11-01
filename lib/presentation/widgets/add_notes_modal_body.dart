@@ -25,6 +25,7 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
   TextEditingController noteTextEditingController = TextEditingController();
   late NotesBloc notesBloc;
   late FToast fToast;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -36,41 +37,14 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
   }
 
   void _onSave() {
-    String note = noteTextEditingController.text;
-    if (note.isNotEmpty) {
+    if (_formKey.currentState!.validate()) {
       Navigator.of(context).pop();
-      NoteItemModel noteItemModel =
-          NoteItemModel(user: widget.user, vin: widget.vin, note: note);
+      NoteItemModel noteItemModel = NoteItemModel(
+          user: widget.user,
+          vin: widget.vin,
+          note: noteTextEditingController.text);
       notesBloc.addNotes(noteItemModel: noteItemModel);
-    } else {
-      showErrorToast('Note must not be empty!');
     }
-  }
-
-  void showErrorToast(String message) {
-    Widget toastBody = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        color: Colors.red,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(Icons.error, color: Colors.white),
-          SizedBox(
-            width: 12.0,
-          ),
-          Text(message, style: TextStyle(color: Colors.white)),
-        ],
-      ),
-    );
-    fToast.removeCustomToast();
-    fToast.showToast(
-      child: toastBody,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 2),
-    );
   }
 
   @override
@@ -126,7 +100,8 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
                           textAlign: TextAlign.start,
                           style: GoogleFonts.roboto(fontSize: 14)),
                       const SizedBox(height: 5),
-                      Container(
+                      Form(
+                        key: _formKey,
                         child: TextFormField(
                           textCapitalization: TextCapitalization.sentences,
                           maxLines: 4,
@@ -147,6 +122,11 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
                             border: OutlineInputBorder(),
                           ),
                           controller: noteTextEditingController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Notes is required';
+                            }
+                          },
                         ),
                       ),
                     ],

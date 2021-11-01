@@ -1,28 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:valuation_tool_web/bloc/vehicle_info/vehicle_info_bloc.dart';
+import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/presentation/widgets/modal/modal_footer.dart';
 import 'package:valuation_tool_web/presentation/widgets/modal/modal_header.dart';
 
 class AddRunNumberModalBody extends StatefulWidget {
-  const AddRunNumberModalBody({Key? key}) : super(key: key);
+  const AddRunNumberModalBody({Key? key, required this.vehicleItem})
+      : super(key: key);
+  final VehicleItem vehicleItem;
   @override
   State<AddRunNumberModalBody> createState() => _AddRunNumberModalBodyState();
 }
 
 class _AddRunNumberModalBodyState extends State<AddRunNumberModalBody> {
-  TextEditingController runNumberTextEditingController =
-      TextEditingController();
+  late TextEditingController runNumberTextEditingController;
   final _formKey = GlobalKey<FormState>();
+  late VehicleInfoBloc vehicleInfoBloc;
   @override
   void initState() {
+    vehicleInfoBloc = BlocProvider.of<VehicleInfoBloc>(context);
+    runNumberTextEditingController =
+        TextEditingController(text: widget.vehicleItem.runNumber);
     super.initState();
   }
 
   void _onSave() {
     print('SAVE...');
     if (_formKey.currentState!.validate()) {
-      // api call...
+      Navigator.of(context).pop();
+      vehicleInfoBloc.updateRunNumber(
+          vehicleItem: widget.vehicleItem
+              .copyWith(runNumber: runNumberTextEditingController.text));
     }
   }
 
