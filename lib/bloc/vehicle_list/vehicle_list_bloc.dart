@@ -38,4 +38,20 @@ class VehicleListBloc extends Cubit<VehicleListState> {
       emit(VehicleListFailedState(error: e.toString()));
     }
   }
+
+  void deleteVehicle({required String id, required String folderName}) async {
+    emit(DeleteVehicleLoadingState());
+    try {
+      bool success = await _firestoreVehicleService.deleteVehicle(id: id);
+      if (success) {
+        if (folderName != 'Add to folder') {
+          getVehicleListPerFolder(folderName: folderName);
+        } else {
+          getVehicleList();
+        }
+      }
+    } catch (e) {
+      emit(DeleteVehicleFailedState(error: e.toString()));
+    }
+  }
 }

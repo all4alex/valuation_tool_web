@@ -34,13 +34,13 @@ class _AppState extends State<App> {
       title: 'Carketa Valuation Web',
       debugShowCheckedModeBanner: false,
       scrollBehavior: AppScrollBehavior(),
-      // initialRoute: '/',
-      // onGenerateRoute: Flurorouter.router.generator,
-      home: Scaffold(
-          backgroundColor: const Color(0xfff5f7fd),
-          body: VehicleDetails(
-              onAddSuccess:
-                  () {})), // uncomment this line if working on vehicle details. So hot restart will work
+      initialRoute: '/',
+      onGenerateRoute: Flurorouter.router.generator,
+      // home: Scaffold(
+      //     backgroundColor: const Color(0xfff5f7fd),
+      //     body: VehicleDetails(
+      //         onAddSuccess:
+      //             () {})), // uncomment this line if working on vehicle details. So hot restart will work
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
     );
   }

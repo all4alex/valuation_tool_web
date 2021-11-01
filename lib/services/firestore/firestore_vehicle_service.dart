@@ -104,4 +104,12 @@ class FirestoreVehicleService {
     });
     return isSuccess;
   }
+
+  Future<bool> deleteVehicle({required String id}) async {
+    bool isSuccess = false;
+    await _collectionReference.doc(id).delete().then((value) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
 }

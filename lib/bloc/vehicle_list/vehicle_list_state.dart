@@ -30,3 +30,22 @@ class VehicleListFailedState extends VehicleListState {
   @override
   List<Object> get props => <Object>[];
 }
+
+class DeleteVehicleLoadingState extends VehicleListState {
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class DeleteVehicleSuccessState extends VehicleListState {
+  DeleteVehicleSuccessState();
+
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class DeleteVehicleFailedState extends VehicleListState {
+  DeleteVehicleFailedState({required this.error});
+  final String error;
+  @override
+  List<Object> get props => <Object>[];
+}
