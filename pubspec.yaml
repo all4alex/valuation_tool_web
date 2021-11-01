@@ -32,6 +32,7 @@ dependencies:
   fluro: ^2.0.3
   file_picker: ^4.1.4
   syncfusion_flutter_charts: ^19.3.47
+  flutter_typeahead: ^3.2.1
 
 dev_dependencies:
   flutter_test:

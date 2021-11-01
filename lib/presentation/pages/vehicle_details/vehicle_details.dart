@@ -22,6 +22,7 @@ import 'package:valuation_tool_web/models/used_vehicles.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/retail_and_profit.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_activity.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_notes.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_condition_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_mileage_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_region_modal_body.dart';
 
@@ -235,6 +236,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                   info: 'Average',
                                   space: 5,
                                   infoDecoration: TextDecoration.none,
+                                  modalWidget: AddConditionModalBody(),
+                                  isClickable: true,
                                   infoColor: Colors.orange),
                             ),
                           ],
