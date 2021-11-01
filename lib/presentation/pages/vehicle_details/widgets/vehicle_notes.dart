@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
 import 'package:valuation_tool_web/bloc/notes/notes_state.dart';
 import 'package:valuation_tool_web/models/firestore/note_item_model.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_notes_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/update_notes_modal_body.dart';
 
 class VehicleNotes extends StatefulWidget {
   VehicleNotes({required this.email, required this.name, required this.vin});
@@ -116,7 +118,10 @@ class _VehicleNotesState extends State<VehicleNotes> {
                     itemCount: list.length,
                     itemBuilder: (BuildContext context, int i) {
                       return NoteItem(
-                          notes: list[i].note!, email: list[i].user!);
+                        notes: list[i].note!,
+                        email: list[i].user!,
+                        name: widget.name,
+                      );
                     },
                     separatorBuilder: (BuildContext context, int index) {
                       return const Divider(height: 30);
@@ -144,11 +149,44 @@ class _VehicleNotesState extends State<VehicleNotes> {
 }
 
 class NoteItem extends StatelessWidget {
-  const NoteItem({Key? key, required this.email, required this.notes})
-      : super(key: key);
+  const NoteItem({
+    Key? key,
+    required this.email,
+    required this.name,
+    this.notes,
+  }) : super(key: key);
 
   final String email;
-  final String notes;
+  final String? notes;
+  final String name;
+
+  void _showUpdateNotesModal(BuildContext context) async {
+    showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 0),
+      context: context,
+      pageBuilder: (BuildContext context, anim1, anim2) {
+        return Align(
+          alignment: Alignment.center,
+          child: UpdateNotesModalBody(
+            subTitle: name,
+            name: email, // this should be user details
+            notes: notes!,
+          ),
+        );
+      },
+      transitionBuilder:
+          (BuildContext context, anim1, Animation<double> anim2, Widget child) {
+        return SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
+                  .animate(anim1),
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,17 +204,58 @@ class NoteItem extends StatelessWidget {
             SizedBox(
               width: screenSize.width * .28,
               child: SelectableText(
-                notes,
+                notes!,
                 style: TextStyle(overflow: TextOverflow.clip, fontSize: 12),
               ),
             ),
-            InkWell(
-              onTap: () {},
+            PopupMenuButton(
+              onSelected: (selected) {
+                // this._onMenuSelect(context, selected);
+                if (selected == 'Edit Note') {
+                  _showUpdateNotesModal(context);
+                }
+              },
+              elevation: 3.2,
               child: Padding(
                 padding: EdgeInsets.zero,
                 child: Icon(Icons.more_horiz),
               ),
-            )
+              // child: null,
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'Edit Note',
+                  child: Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.edit,
+                        color: Colors.green,
+                        size: 15,
+                      ),
+                      Text(
+                        '  Edit Note',
+                        style: TextStyle(color: Colors.green, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.trash,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                      Text(
+                        '  Remove Note',
+                        style: TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 10),

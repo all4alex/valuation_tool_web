@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
 import 'package:valuation_tool_web/models/firestore/note_item_model.dart';
+import 'package:valuation_tool_web/presentation/widgets/modal/modal_footer.dart';
+import 'package:valuation_tool_web/presentation/widgets/modal/modal_header.dart';
 
 class AddNotesModalBody extends StatefulWidget {
   const AddNotesModalBody(
@@ -30,6 +33,18 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
     fToast = FToast();
     fToast.init(context);
     super.initState();
+  }
+
+  void _onSave() {
+    String note = noteTextEditingController.text;
+    if (note.isNotEmpty) {
+      Navigator.of(context).pop();
+      NoteItemModel noteItemModel =
+          NoteItemModel(user: widget.user, vin: widget.vin, note: note);
+      notesBloc.addNotes(noteItemModel: noteItemModel);
+    } else {
+      showErrorToast('Note must not be empty!');
+    }
   }
 
   void showErrorToast(String message) {
@@ -70,181 +85,79 @@ class _AddNotesModalBodyState extends State<AddNotesModalBody> {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                Container(
-                    height: 80,
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        topRight: Radius.circular(5),
-                      ),
-                      color: Color(0xffFFFFFF),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: Color(0xffE6E6E6),
-                            offset: Offset(0.0, 1.0),
-                            blurRadius: 6.0,
-                            spreadRadius: 0),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Add Notes',
-                          style: GoogleFonts.roboto(
-                              fontSize: 20,
-                              color: Color(0xff191919),
-                              fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(widget.name,
-                            style: GoogleFonts.roboto(
-                                fontSize: 16, color: Color(0xff191919)))
-                      ],
-                    )),
+                ModalHeader(title: 'Add Notes', subTitle: widget.name),
                 const SizedBox(height: 10),
                 Container(
-                    height: screenSize.height * .5,
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height: 20),
-                        Text('Name',
-                            textAlign: TextAlign.start,
-                            style: GoogleFonts.roboto(fontSize: 14)),
-                        const SizedBox(height: 5),
-                        Container(
-                          child: TextFormField(
-                            textCapitalization: TextCapitalization.sentences,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.blue, width: 2),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.red, width: 2),
-                              ),
-                              hintText: 'John Doe',
-                              border: OutlineInputBorder(),
+                  height: screenSize.height * .5,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(height: 20),
+                      Text('Name',
+                          textAlign: TextAlign.start,
+                          style: GoogleFonts.roboto(fontSize: 14)),
+                      const SizedBox(height: 5),
+                      Container(
+                        child: TextFormField(
+                          textCapitalization: TextCapitalization.sentences,
+                          enabled: false,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
                             ),
-                            controller: nameTextEditingController,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Text('Notes',
-                            textAlign: TextAlign.start,
-                            style: GoogleFonts.roboto(fontSize: 14)),
-                        const SizedBox(height: 5),
-                        Container(
-                          child: TextFormField(
-                            textCapitalization: TextCapitalization.sentences,
-                            maxLines: 4,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.blue, width: 2),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.red, width: 2),
-                              ),
-                              hintText: 'Add Notes',
-                              border: OutlineInputBorder(),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.blue, width: 2),
                             ),
-                            controller: noteTextEditingController,
+                            errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 2),
+                            ),
+                            hintText: 'John Doe',
+                            border: OutlineInputBorder(),
                           ),
+                          controller: nameTextEditingController,
                         ),
-                      ],
-                    )),
-                Container(
-                    height: 70,
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    alignment: Alignment.bottomCenter,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
                       ),
-                      color: Color(0xffFFFFFF),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: Color(0xffE6E6E6),
-                            offset: Offset(0.0, 1.0),
-                            blurRadius: 6.0,
-                            spreadRadius: 0),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.close, color: Colors.red),
-                                Text('  CANCEL',
-                                    style: TextStyle(color: Colors.red)),
-                              ],
+                      const SizedBox(height: 30),
+                      Text('Notes',
+                          textAlign: TextAlign.start,
+                          style: GoogleFonts.roboto(fontSize: 14)),
+                      const SizedBox(height: 5),
+                      Container(
+                        child: TextFormField(
+                          textCapitalization: TextCapitalization.sentences,
+                          maxLines: 4,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey),
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.blue, width: 2),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 2),
+                            ),
+                            hintText: 'Add Notes',
+                            border: OutlineInputBorder(),
                           ),
+                          controller: noteTextEditingController,
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: Color(0xff17A0FB),
-                            ),
-                            onPressed: () {
-                              String note = noteTextEditingController.text;
-                              if (note.isNotEmpty) {
-                                Navigator.of(context).pop();
-                                NoteItemModel noteItemModel = NoteItemModel(
-                                    user: widget.user,
-                                    vin: widget.vin,
-                                    note: note);
-                                notesBloc.addNotes(
-                                    noteItemModel: noteItemModel);
-                              } else {
-                                showErrorToast('Note must not be empty!');
-                              }
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.save, color: Colors.white),
-                                  Text('  SAVE',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 15)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                ),
+                ModalFooter(
+                  onSave: _onSave,
+                  color: Colors.blue,
+                  icon: FontAwesomeIcons.save,
+                  submitName: 'SAVE',
+                ),
               ],
             ),
           ),

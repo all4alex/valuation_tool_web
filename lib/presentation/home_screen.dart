@@ -242,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           Container(
+            color: Color(0xffD9DBE1),
             width: MediaQuery.of(context).size.width * 0.75,
             child: Center(
               child: IndexedStack(

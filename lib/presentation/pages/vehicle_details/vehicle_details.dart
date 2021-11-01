@@ -22,6 +22,9 @@ import 'package:valuation_tool_web/models/used_vehicles.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/retail_and_profit.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_activity.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/widgets/vehicle_notes.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_condition_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_mileage_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_region_modal_body.dart';
 
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_retail_data.dart';
 import 'package:valuation_tool_web/presentation/widgets/blackbook/black_book_trade_in_data.dart';
@@ -197,12 +200,50 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                         folderName: folderName,
                         vehicleItem: vehicleItem,
                       ),
-                      VehicleDetailsTag(
-                        regions: 'Utah',
-                        mileage: state.vehicleItem.miles!,
-                        condition: 'Average',
+                      // VehicleDetailsTag(
+                      //   regions: 'Utah',
+                      //   mileage: state.vehicleItem.miles!,
+                      //   condition: 'Average',
+                      // ),
+                      Container(
+                        width: screenSize.width * .38,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              child: InfoItemWithSpacing(
+                                name: 'Mileage:',
+                                info: '35679',
+                                isClickable: true,
+                                space: 5,
+                                infoDecoration: TextDecoration.none,
+                                modalWidget: AddMileageModalBody(),
+                              ),
+                            ),
+                            Container(
+                              child: InfoItemWithSpacing(
+                                name: 'Region:',
+                                info: 'Utah',
+                                isClickable: true,
+                                space: 5,
+                                infoDecoration: TextDecoration.none,
+                                modalWidget: AddRegionModalBody(),
+                              ),
+                            ),
+                            Container(
+                              child: InfoItemWithSpacing(
+                                  name: 'Condition:',
+                                  info: 'Average',
+                                  space: 5,
+                                  infoDecoration: TextDecoration.none,
+                                  modalWidget: AddConditionModalBody(),
+                                  isClickable: true,
+                                  infoColor: Colors.orange),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 15),
                       RetailAndProfit(
                         usedVehicleListItem: usedVehicleListItem,
                         retailStatisticsResponse:
