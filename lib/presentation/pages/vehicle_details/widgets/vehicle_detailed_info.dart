@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:valuation_tool_web/models/used_vehicle_list.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_auction_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_run_number_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/info_item_with_spacing.dart';
 
 class VehicleDetailedInfo extends StatelessWidget {
@@ -114,7 +116,15 @@ class Info extends StatelessWidget {
           Container(
               width: 150,
               child: InfoItemWithSpacing(
-                  name: 'Run Number:', info: 'Empty', isClickable: true)),
+                name: 'Run Number:',
+                info: 'Empty',
+                isClickable: true,
+                modalWidget: AddRunNumberModalBody(),
+              )),
+          // Container(
+          //     width: 150,
+          //     child: InfoItemWithSpacing(
+          //         name: 'Mileage:', info: '$mileage', isClickable: true)),
         ]),
         SizedBox(width: 70),
         Column(children: [
@@ -129,7 +139,15 @@ class Info extends StatelessWidget {
           Container(
               width: 150,
               child: InfoItemWithSpacing(
-                  name: 'Auction:', info: 'Demo', isClickable: true)),
+                name: 'Auction:',
+                info: 'Demo',
+                isClickable: true,
+                modalWidget: AddAuctionModalBody(),
+              )),
+          // Container(
+          //     width: 150,
+          //     child: InfoItemWithSpacing(
+          //         name: 'Region:', info: 'Utah', isClickable: true)),
         ]),
       ],
     );
