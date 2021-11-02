@@ -3,6 +3,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'package:valuation_tool_web/app/utils/app_scroll_behavior.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/vehicle_details.dart';
+import 'package:valuation_tool_web/presentation/pages/vehicle_list.dart';
 import 'package:valuation_tool_web/routes.dart';
 
 class App extends StatefulWidget {

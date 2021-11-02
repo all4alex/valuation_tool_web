@@ -81,4 +81,20 @@ class FolderBloc extends Cubit<FolderState> {
       emit(DeleteFolderFailedState(error: e.toString()));
     }
   }
+
+  void renameFolder(
+      {required String folderName,
+      required String id,
+      required String oldFolderName}) async {
+    emit(RenameFolderLoadingState());
+    try {
+      await _firestoreFolderService.updateFolder(
+          folderName: folderName, id: id, oldFolderName: oldFolderName);
+
+      emit(RenameFolderSuccessState(folderName: folderName));
+    } catch (e) {
+      print('THE FOLDER $e');
+      emit(RenameFolderFailedState(error: e.toString()));
+    }
+  }
 }

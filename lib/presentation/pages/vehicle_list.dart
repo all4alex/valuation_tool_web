@@ -12,6 +12,7 @@ import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_change_to_folder_modal_body.dart';
+import 'package:valuation_tool_web/presentation/widgets/rename_folder_modal_body.dart';
 
 import '../widgets/add_vehicle_modal_body.dart';
 
@@ -140,7 +141,33 @@ class _VehicleListState extends State<VehicleList> {
                                     size: 20, color: Colors.blue)),
                             TextButton(
                                 onPressed: () {
-                                  // widget.onAddButtonClicked();
+                                  showGeneralDialog(
+                                    barrierDismissible: true,
+                                    barrierLabel: '',
+                                    transitionDuration:
+                                        const Duration(milliseconds: 0),
+                                    context: context,
+                                    pageBuilder:
+                                        (BuildContext context, anim1, anim2) {
+                                      return Align(
+                                        alignment: Alignment.center,
+                                        child: RenameFolderModalBody(
+                                            folderItem: folderItem!),
+                                      );
+                                    },
+                                    transitionBuilder: (BuildContext context,
+                                        anim1,
+                                        Animation<double> anim2,
+                                        Widget child) {
+                                      return SlideTransition(
+                                        position: Tween<Offset>(
+                                                begin: const Offset(0, 1),
+                                                end: const Offset(0, 0))
+                                            .animate(anim1),
+                                        child: child,
+                                      );
+                                    },
+                                  );
                                 },
                                 child: Text('Rename Folder',
                                     textAlign: TextAlign.center)),
