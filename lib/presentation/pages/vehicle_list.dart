@@ -11,6 +11,7 @@ import 'package:valuation_tool_web/bloc/vehicle_list/vehicle_list_state.dart';
 import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 import 'package:valuation_tool_web/models/vehicle_response.dart';
+import 'package:valuation_tool_web/presentation/widgets/add_change_to_folder_modal_body.dart';
 
 import '../widgets/add_vehicle_modal_body.dart';
 
@@ -199,104 +200,135 @@ class _VehicleListState extends State<VehicleList> {
                       itemCount: vehicleItemList.length,
                       itemBuilder: (BuildContext context, int i) {
                         VehicleItem vehicleItem = vehicleItemList[i];
-                        return InkWell(
-                          onTap: () {
-                            widget.onItemSelect(vehicleItem.vin);
-                          },
-                          child: Container(
-                              padding: const EdgeInsets.only(
-                                  left: 20, right: 20, top: 10),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Container(
-                                        width: screenSize.width * .2,
-                                        alignment: Alignment.centerLeft,
-                                        child: Row(
-                                          children: <Widget>[
-                                            Container(
-                                                height: 68,
-                                                width: 100,
-                                                decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xffF3F3F3),
-                                                    border: Border.all(
-                                                        width: 1,
-                                                        style:
-                                                            BorderStyle.solid,
-                                                        color: Colors.black)),
-                                                child: CachedNetworkImage(
-                                                  fit: BoxFit.fitHeight,
-                                                  imageUrl:
-                                                      '${vehicleItem.imageUrl}_200x200',
-                                                  errorWidget: (context, url,
-                                                          error) =>
-                                                      Image.asset(
-                                                          'assets/images/no_image.jpeg'),
-                                                )),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              width: screenSize.width * .1,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Text(vehicleItem.name!,
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          overflow:
-                                                              TextOverflow.clip,
-                                                          fontSize: 14)),
-                                                  Text(vehicleItem.subName!,
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Color(
-                                                              0xff898989))),
-                                                ],
+                        return Container(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Container(
+                                      width: screenSize.width * .2,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        children: <Widget>[
+                                          InkWell(
+                                            onTap: () {
+                                              widget.onItemSelect(
+                                                  vehicleItem.vin);
+                                            },
+                                            child: Container(
+                                              height: 68,
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xffF3F3F3),
+                                                  border: Border.all(
+                                                      width: 1,
+                                                      style: BorderStyle.solid,
+                                                      color: Colors.black)),
+                                              child: CachedNetworkImage(
+                                                fit: BoxFit.fitHeight,
+                                                imageUrl:
+                                                    '${vehicleItem.imageUrl}_200x200',
+                                                errorWidget: (context, url,
+                                                        error) =>
+                                                    Image.asset(
+                                                        'assets/images/no_image.jpeg'),
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            width: screenSize.width * .1,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(vehicleItem.name!,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        overflow:
+                                                            TextOverflow.clip,
+                                                        fontSize: 14)),
+                                                Text(vehicleItem.subName!,
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        color:
+                                                            Color(0xff898989))),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Container(
-                                        width: screenSize.width * .13,
+                                    ),
+                                    Container(
+                                      width: screenSize.width * .13,
+                                      alignment: Alignment.centerLeft,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(vehicleItem.vin!),
+                                          SizedBox(
+                                              height: 15,
+                                              width: 30,
+                                              child: SvgPicture.asset(
+                                                  'assets/svg/copy_icon.svg',
+                                                  color: Colors.green,
+                                                  fit: BoxFit.fitHeight)),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                        width: screenSize.width * .08,
                                         alignment: Alignment.centerLeft,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(vehicleItem.vin!),
-                                            SizedBox(
-                                                height: 15,
-                                                width: 30,
-                                                child: SvgPicture.asset(
-                                                    'assets/svg/copy_icon.svg',
-                                                    color: Colors.green,
-                                                    fit: BoxFit.fitHeight)),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                          width: screenSize.width * .08,
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                              '${vehicleItem.miles} miles',
-                                              style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.clip))),
-                                      Container(
-                                          width: screenSize.width * .08,
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                              '${vehicleItem.addedDate}',
-                                              style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.clip))),
-                                      Container(
+                                        child: Text(
+                                            '${vehicleItem.miles} miles',
+                                            style: TextStyle(
+                                                overflow: TextOverflow.clip))),
+                                    Container(
+                                        width: screenSize.width * .08,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text('${vehicleItem.addedDate}',
+                                            style: TextStyle(
+                                                overflow: TextOverflow.clip))),
+                                    InkWell(
+                                      onTap: () {
+                                        showGeneralDialog(
+                                          barrierDismissible: true,
+                                          barrierLabel: '',
+                                          transitionDuration:
+                                              const Duration(milliseconds: 0),
+                                          context: context,
+                                          pageBuilder: (BuildContext context,
+                                              anim1, anim2) {
+                                            return Align(
+                                              alignment: Alignment.center,
+                                              child: AddChangeToFolderModalBody(
+                                                vehicleItem: vehicleItem,
+                                              ),
+                                            );
+                                          },
+                                          transitionBuilder:
+                                              (BuildContext context,
+                                                  anim1,
+                                                  Animation<double> anim2,
+                                                  Widget child) {
+                                            return SlideTransition(
+                                              position: Tween<Offset>(
+                                                      begin: const Offset(0, 1),
+                                                      end: const Offset(0, 0))
+                                                  .animate(anim1),
+                                              child: child,
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Container(
                                         width: screenSize.width * .12,
                                         alignment: Alignment.centerLeft,
                                         child: Row(
@@ -319,19 +351,19 @@ class _VehicleListState extends State<VehicleList> {
                                           ],
                                         ),
                                       ),
-                                      SizedBox(
-                                          height: 15,
-                                          width: 20,
-                                          child: SvgPicture.asset(
-                                              'assets/svg/preference_icon.svg',
-                                              color: Color(0xff494949),
-                                              fit: BoxFit.fitHeight)),
-                                    ],
-                                  ),
-                                  const Divider()
-                                ],
-                              )),
-                        );
+                                    ),
+                                    SizedBox(
+                                        height: 15,
+                                        width: 20,
+                                        child: SvgPicture.asset(
+                                            'assets/svg/preference_icon.svg',
+                                            color: Color(0xff494949),
+                                            fit: BoxFit.fitHeight)),
+                                  ],
+                                ),
+                                const Divider()
+                              ],
+                            ));
                       }));
             })),
           ],
