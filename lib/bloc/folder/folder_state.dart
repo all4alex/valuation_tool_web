@@ -82,3 +82,22 @@ class DeleteFolderFailedState extends FolderState {
   @override
   List<Object> get props => <Object>[];
 }
+
+class RenameFolderLoadingState extends FolderState {
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class RenameFolderSuccessState extends FolderState {
+  RenameFolderSuccessState({required this.folderName});
+  final String folderName;
+  @override
+  List<Object> get props => <Object>[];
+}
+
+class RenameFolderFailedState extends FolderState {
+  RenameFolderFailedState({required this.error});
+  final String error;
+  @override
+  List<Object> get props => <Object>[];
+}

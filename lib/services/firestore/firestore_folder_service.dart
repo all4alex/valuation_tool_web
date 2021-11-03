@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valuation_tool_web/models/firestore/folder_item.dart';
+import 'package:valuation_tool_web/models/firestore/vehicle_item.dart';
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -9,6 +10,12 @@ class FirestoreFolderService {
       .collection('folders')
       .withConverter<FolderItem>(
           fromFirestore: (snapshot, _) => FolderItem.fromJson(snapshot.data()!),
+          toFirestore: (model, _) => model.toJson());
+  final CollectionReference _collectionReference2 = _firestore
+      .collection('vehicles')
+      .withConverter<VehicleItem>(
+          fromFirestore: (snapshot, _) =>
+              VehicleItem.fromJson(snapshot.data()!),
           toFirestore: (model, _) => model.toJson());
 
   Future<List<FolderItem>> getAllFolders({required String email}) async {
@@ -60,5 +67,31 @@ class FirestoreFolderService {
         .then((value) => value.docs.first.data() as FolderItem);
 
     return folderItem;
+  }
+
+  Future<bool> updateFolder(
+      {required String folderName,
+      required String id,
+      required String oldFolderName}) async {
+    bool isSuccess = false;
+
+    await _collectionReference.doc(id).update({
+      'folderName': folderName,
+    }).then((value) {
+      isSuccess = true;
+    });
+    await _collectionReference2
+        .where('folder', isEqualTo: oldFolderName)
+        .get()
+        .then((value) async {
+      for (QueryDocumentSnapshot<VehicleItem> item in value.docs as dynamic) {
+        await _collectionReference2.doc(item.id).update({
+          'folder': folderName,
+        }).then((value) {
+          isSuccess = true;
+        });
+      }
+    });
+    return isSuccess;
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:valuation_tool_web/bloc/category_search/category_search_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/add_to_folder/add_to_folder_bloc.dart';
 import 'package:valuation_tool_web/bloc/folder/folder_bloc.dart';
+import 'package:valuation_tool_web/bloc/folder/folder_dialog/folder_dialog_bloc.dart';
 import 'package:valuation_tool_web/bloc/notes/notes_bloc.dart';
 import 'package:valuation_tool_web/bloc/states/states_bloc.dart';
 import 'package:valuation_tool_web/bloc/upload_image/upload_image_bloc.dart';
@@ -46,5 +47,7 @@ Future<void> main() async {
     BlocProvider<VehicleInfoBloc>(
         create: (BuildContext context) => VehicleInfoBloc()),
     BlocProvider<StatesBloc>(create: (BuildContext context) => StatesBloc()),
+    BlocProvider<FolderDialogBloc>(
+        create: (BuildContext context) => FolderDialogBloc()),
   ], child: const App()));
 }
