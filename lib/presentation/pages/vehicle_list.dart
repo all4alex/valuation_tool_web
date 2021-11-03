@@ -359,22 +359,52 @@ class VehicleListItemWidget extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text('${vehicleItem.addedDate}',
                         style: TextStyle(overflow: TextOverflow.clip))),
-                Container(
-                  width: screenSize.width * .12,
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                          height: 15,
-                          width: 30,
-                          child: SvgPicture.asset('assets/svg/folder_icon.svg',
-                              color: Color(0xff36334E), fit: BoxFit.fitHeight)),
-                      SizedBox(
-                        width: screenSize.width * .09,
-                        child: Text('${vehicleItem.folder}',
-                            style: TextStyle(overflow: TextOverflow.clip)),
-                      )
-                    ],
+                InkWell(
+                  onTap: () {
+                    showGeneralDialog(
+                      barrierDismissible: true,
+                      barrierLabel: '',
+                      transitionDuration: const Duration(milliseconds: 0),
+                      context: context,
+                      pageBuilder: (BuildContext context, anim1, anim2) {
+                        return Align(
+                          alignment: Alignment.center,
+                          child: AddChangeToFolderModalBody(
+                            vehicleItem: vehicleItem,
+                          ),
+                        );
+                      },
+                      transitionBuilder: (BuildContext context, anim1,
+                          Animation<double> anim2, Widget child) {
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                                  begin: const Offset(0, 1),
+                                  end: const Offset(0, 0))
+                              .animate(anim1),
+                          child: child,
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: screenSize.width * .12,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                            height: 15,
+                            width: 30,
+                            child: SvgPicture.asset(
+                                'assets/svg/folder_icon.svg',
+                                color: Color(0xff36334E),
+                                fit: BoxFit.fitHeight)),
+                        SizedBox(
+                          width: screenSize.width * .09,
+                          child: Text('${vehicleItem.folder}',
+                              style: TextStyle(overflow: TextOverflow.clip)),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
