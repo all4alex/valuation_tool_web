@@ -42,6 +42,7 @@ class _RenameFolderModalBodyState extends State<RenameFolderModalBody> {
     return BlocListener<FolderBloc, FolderState>(
       listener: (BuildContext context, FolderState state) {
         if (state is RenameFolderSuccessState) {
+          Navigator.of(context).pop();
           BlocProvider.of<VehicleListBloc>(context).getVehicleListPerFolder(
               folderName: folderNameTextEditingController.text);
           BlocProvider.of<FolderBloc>(context).getAllFolder();
