@@ -16,6 +16,7 @@ import 'bloc/black_book/black_book_bloc.dart';
 import 'bloc/vehicle_list/vehicle_list_bloc.dart';
 
 List<String> pages = [
+  'dashboard',
   'vehicles',
   'folders',
   'details',

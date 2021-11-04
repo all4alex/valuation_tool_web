@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'package:valuation_tool_web/app/utils/app_scroll_behavior.dart';
+import 'package:valuation_tool_web/presentation/pages/dashboard.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_details/vehicle_details.dart';
 import 'package:valuation_tool_web/presentation/pages/vehicle_list.dart';
 import 'package:valuation_tool_web/routes.dart';
@@ -37,6 +38,7 @@ class _AppState extends State<App> {
       scrollBehavior: AppScrollBehavior(),
       initialRoute: '/',
       onGenerateRoute: Flurorouter.router.generator,
+      // home: Scaffold(body: Dashboard()),
       // home: Scaffold(
       //     backgroundColor: const Color(0xfff5f7fd),
       //     body: VehicleDetails(

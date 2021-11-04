@@ -11,8 +11,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration(milliseconds: 1000), () {
-      Navigator.pushNamed(context, '/main/vehicles',
-          arguments: VehicleListArgs('All Vehicles'));
+      // Navigator.pushNamed(context, '/main/vehicles',
+      //     arguments: VehicleListArgs('All Vehicles'));
+      Navigator.pushNamed(
+        context,
+        '/main/dashboard',
+      );
     });
     return Scaffold(
       body: Center(
