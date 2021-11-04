@@ -128,14 +128,21 @@ class RecentActivity extends StatelessWidget {
             ),
           ),
           const Divider(height: 0),
-          activityItem(
-              'Changed the target bid price to \$30,000 on 2020 Lexus NX'),
-          activityItem(
-              'Changed the mileage from \$26,500 to \$30,000 condition from average to rough on a 2020 GMC Yukon'),
-          activityItem(
-              'Changed the target bid price to \$30,000 on 2020 Lexus NX'),
-          activityItem(
-              'Changed the mileage from \$26,500 to \$30,000 condition from average to rough on a 2020 GMC Yukon'),
+          Expanded(
+            flex: 1,
+            child: ListView(
+              children: [
+                activityItem(
+                    'Changed the target bid price to \$30,000 on 2020 Lexus NX'),
+                activityItem(
+                    'Changed the mileage from \$26,500 to \$30,000 condition from average to rough on a 2020 GMC Yukon'),
+                activityItem(
+                    'Changed the target bid price to \$30,000 on 2020 Lexus NX'),
+                activityItem(
+                    'Changed the mileage from \$26,500 to \$30,000 condition from average to rough on a 2020 GMC Yukon'),
+              ],
+            ),
+          ),
           const Divider(),
           SizedBox(
             height: 5,
