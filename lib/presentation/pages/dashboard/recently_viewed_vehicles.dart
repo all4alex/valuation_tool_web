@@ -68,7 +68,7 @@ class RecentlyViewedVehicles extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Container(
-                              width: screenSize.width * .23,
+                              width: screenSize.width * .24,
                               alignment: Alignment.centerLeft,
                               child: Row(
                                 children: <Widget>[
@@ -120,7 +120,7 @@ class RecentlyViewedVehicles extends StatelessWidget {
                               ),
                             ),
                             Container(
-                              width: screenSize.width * .13,
+                              width: screenSize.width * .14,
                               alignment: Alignment.centerLeft,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,

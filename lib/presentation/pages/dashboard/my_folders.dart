@@ -159,21 +159,25 @@ class MyFolders extends StatelessWidget {
           const Divider(height: 0),
           Expanded(
             flex: 1,
-            child: Container(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                children: [
-                  folderItem(screenSize, 'Orem Location', 7),
-                  SizedBox(
-                    height: 30,
+            child: ListView(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                  child: Column(
+                    children: [
+                      folderItem(screenSize, 'Orem Location', 7),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      folderItem(screenSize, 'Manheim Riverside', 2),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      folderItem(screenSize, 'Manheim Southern Cal', 7),
+                    ],
                   ),
-                  folderItem(screenSize, 'Manheim Riverside', 2),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  folderItem(screenSize, 'Manheim Southern Cal', 7),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const Divider(),
