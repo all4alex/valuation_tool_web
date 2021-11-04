@@ -10,6 +10,7 @@ import 'package:valuation_tool_web/models/firestore/folder_item.dart';
 import 'package:valuation_tool_web/presentation/pages/HelpPage.dart';
 import 'package:valuation_tool_web/presentation/pages/ProfilePage.dart';
 import 'package:valuation_tool_web/presentation/pages/SettingsPage.dart';
+import 'package:valuation_tool_web/presentation/pages/dashboard.dart';
 import 'package:valuation_tool_web/presentation/pages/vin_page.dart';
 import 'package:valuation_tool_web/presentation/widgets/add_vehicle_modal_body.dart';
 import 'package:valuation_tool_web/presentation/widgets/folder_list.dart';
@@ -248,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IndexedStack(
                 index: pages.indexOf(widget.page),
                 children: [
+                  Dashboard(),
                   VehicleList(
                       onItemSelect: (String vin) {
                         Navigator.pushNamed(context, '/main/details',
